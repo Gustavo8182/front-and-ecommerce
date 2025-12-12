@@ -1,0 +1,85 @@
+<div class="container mt-4 mb-5">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="text-primary"><i class="bi bi-speedometer2"></i> Painel do Vendedor</h2>
+    <button class="btn btn-outline-secondary" (click)="loadOrders()">
+      <i class="bi bi-arrow-clockwise"></i> Atualizar
+    </button>
+  </div>
+
+  <div class="card shadow-sm border-0">
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="bg-light">
+            <tr>
+              <th class="ps-4">Data / ID</th>
+              <th>Cliente</th>
+              <th>Entrega</th>
+              <th>Total</th>
+              <th>Status</th>
+              <th class="text-end pe-4">Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let order of orders">
+              <td class="ps-4">
+                <strong>{{ order.creationDate | date:'dd/MM HH:mm' }}</strong><br>
+                <small class="text-muted" style="font-size: 0.75rem">{{ order.id }}</small>
+              </td>
+
+              <td>
+                <i class="bi bi-person-circle text-muted"></i> {{ order.user?.login || 'Cliente' }}
+              </td>
+
+              <td>
+                <small *ngIf="order.address">
+                  {{ order.address.city }}/{{ order.address.state }}
+                </small>
+                <span *ngIf="!order.address" class="text-danger small">Sem endereço</span>
+              </td>
+
+              <td class="text-success fw-bold">
+                {{ getTotal(order) | currency:'BRL' }}
+              </td>
+
+              <td>
+                <span class="badge"
+                      [ngClass]="{
+                        'bg-warning text-dark': order.status === 'WAITING_PAYMENT',
+                        'bg-success': order.status === 'PAID',
+                        'bg-info text-dark': order.status === 'SHIPPED',
+                        'bg-primary': order.status === 'DELIVERED',
+                        'bg-danger': order.status === 'CANCELED'
+                      }">
+                  {{ order.status }}
+                </span>
+              </td>
+
+              <td class="text-end pe-4">
+
+                <button *ngIf="order.status === 'PAID'"
+                        class="btn btn-sm btn-outline-primary me-2"
+                        (click)="changeStatus(order, 'SHIPPED')"
+                        title="Marcar como Enviado">
+                  <i class="bi bi-box-seam"></i> Enviar
+                </button>
+
+                <button *ngIf="order.status === 'SHIPPED'"
+                        class="btn btn-sm btn-outline-success"
+                        (click)="changeStatus(order, 'DELIVERED')"
+                        title="Marcar como Entregue">
+                  <i class="bi bi-check-lg"></i> Entregar
+                </button>
+
+                <span *ngIf="order.status === 'DELIVERED'" class="text-muted small">
+                  <i class="bi bi-check-all"></i> Concluído
+                </span>
+
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

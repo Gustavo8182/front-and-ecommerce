@@ -27,4 +27,17 @@ export class MyOrdersComponent implements OnInit {
   getTotal(order: any): number {
     return order.items.reduce((acc: number, item: any) => acc + (item.price * item.quantity), 0);
   }
+
+  // Adicione este método
+  pay(orderId: string) {
+    if(confirm('Simular pagamento deste pedido?')) {
+      this.orderService.payOrder(orderId).subscribe({
+        next: () => {
+          alert('Pagamento confirmado! O status será atualizado.');
+          this.ngOnInit(); // Recarrega a lista para ver o status novo
+        },
+        error: (err) => alert('Erro ao processar pagamento.')
+      });
+    }
+  }
 }

@@ -1,13 +1,15 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
-import { jwtDecode } from 'jwt-decode'; // <--- Importe a biblioteca
+import { jwtDecode } from 'jwt-decode';
+import { map } from 'rxjs/operators';
+import { environment } from '../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = 'http://localhost:8080/auth';
+  private apiUrl = `${environment.apiBaseUrl}/auth`;
 
   // Agora guardamos o NOME do usuário, não só booleano
   private username = new BehaviorSubject<string>("");
@@ -47,6 +49,12 @@ export class AuthService {
           this.decodeToken(); // <--- Decodifica assim que loga
         })
       );
+  }
+
+  isLoggedIn(): Observable<boolean> {
+    return this.username.asObservable().pipe(
+      map(user => !!user)
+    );
   }
 
   logout() {

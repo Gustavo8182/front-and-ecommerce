@@ -1,31 +1,15 @@
 <div class="container mt-4">
-  <h2 class="mb-4">Nossos Produtos</h2>
 
-<div class="row mb-4">
-    <div class="col-md-6 offset-md-3">
-      <div class="input-group">
-        <input type="text"
-               class="form-control"
-               placeholder="Buscar produtos (ex: Gamer)"
-               [(ngModel)]="searchTerm"
-               (keydown)="handleKeyUp($event)">
-
-        <button class="btn btn-primary" type="button" (click)="onSearch()">
-          <i class="bi bi-search"></i> Pesquisar
-        </button>
-
-        <button *ngIf="searchTerm" class="btn btn-outline-secondary" type="button" (click)="searchTerm = ''; onSearch()">
-          <i class="bi bi-x-lg"></i>
-        </button>
-      </div>
-    </div>
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Resultados para: <span class="text-primary">"{{ searchTerm }}"</span></h2>
+    <a routerLink="/" class="btn btn-outline-secondary">Voltar para Home</a>
   </div>
 
-  <div *ngIf="products.length === 0" class="alert alert-info">
-    Nenhum produto encontrado ou carregando...
+  <div *ngIf="products.length === 0" class="alert alert-warning">
+    Nenhum produto encontrado para essa pesquisa.
   </div>
 
-<div class="row">
+  <div class="row">
     <div class="col-md-4 mb-4" *ngFor="let product of products">
       <div class="card h-100 shadow-sm">
 
@@ -72,29 +56,4 @@
       </div>
     </div>
   </div>
-
-  <nav aria-label="Navegação de página" class="mt-4" *ngIf="totalPages > 1">
-    <ul class="pagination justify-content-center">
-
-      <li class="page-item" [class.disabled]="currentPage === 0">
-        <button class="page-link" (click)="changePage(currentPage - 1)">
-          <span aria-hidden="true">&laquo;</span> Anterior
-        </button>
-      </li>
-
-      <li class="page-item disabled">
-        <span class="page-link">
-          Página {{ currentPage + 1 }} de {{ totalPages }}
-        </span>
-      </li>
-
-      <li class="page-item" [class.disabled]="currentPage === totalPages - 1">
-        <button class="page-link" (click)="changePage(currentPage + 1)">
-          Próximo <span aria-hidden="true">&raquo;</span>
-        </button>
-      </li>
-
-    </ul>
-  </nav>
-
 </div>

@@ -4,11 +4,12 @@ import { FormsModule } from '@angular/forms';
 import { ProductService } from '../../services/product.service';
 import { CartService } from '../../services/cart.service';
 import { Product } from '../../models/product.model';
+import { Router, RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-product-list',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './product-list.component.html',
   styleUrl: './product-list.component.scss'
 })
@@ -24,17 +25,24 @@ export class ProductListComponent implements OnInit {
 
 constructor(
     private productService: ProductService,
-    private cartService: CartService
+    private cartService: CartService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
     this.loadProducts(this.currentPage);
   }
 
-  onSearch() {
-    console.log('Buscando por:', this.searchTerm); // para debug
-    this.currentPage = 0;
-    this.loadProducts(0);
+ onSearch() {
+    if (!this.searchTerm) return;
+
+    // Cria a URL da nova rota
+    const url = this.router.serializeUrl(
+      this.router.createUrlTree(['/search'], { queryParams: { q: this.searchTerm } })
+    );
+
+    // Abre em nova aba ('_blank')
+    window.open(url, '_blank');
   }
 
   addToCart(product: Product) {

@@ -13,17 +13,17 @@ import { OrderService } from './services/order.service';
   styleUrl: './app.component.scss'
 })
 export class AppComponent implements OnInit {
-  cartCount: number = 0;
-  loggedUser: string = ""; // Variável para guardar o nome
+ cartCount: number = 0;
+  loggedUser: string = "";
 
   constructor(
     private cartService: CartService,
-    private authService: AuthService,
-    private orderService: OrderService
+    private authService: AuthService
+    // OrderService removido
   ) {}
 
   ngOnInit(): void {
-    // Ouve as mudanças no nome do carrinho
+    // Ouve as mudanças no contador do carrinho
     this.cartService.getCount().subscribe(count => this.cartCount = count);
 
     // Ouve as mudanças no nome do usuário
@@ -34,29 +34,5 @@ export class AppComponent implements OnInit {
 
   logout() {
     this.authService.logout();
-  }
-
-  checkout() {
-    if (!this.loggedUser) {
-      alert('Faça login para comprar!');
-      return;
-    }
-
-  const cartItems = this.cartService.getItems(); // Pega os itens (agora são CartItem[])
-    if (cartItems.length === 0) {
-      alert('Seu carrinho está vazio!');
-      return;
-    }
-    // Passamos a lista inteira, o serviço trata a conversão
-    this.orderService.createOrder(cartItems).subscribe({
-      next: (order) => {
-        alert('Pedido realizado com sucesso! ID: ' + order.id);
-        this.cartService.clearCart();
-      },
-      error: (err) => {
-        console.error(err);
-        alert('Erro ao finalizar compra.');
-      }
-    });
   }
 }

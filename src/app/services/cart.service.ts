@@ -1,52 +1,94 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { Product, CartItem } from '../models/product.model'; // Importe CartItem
+import { Product, CartItem } from '../models/product.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CartService {
 
-  // Agora guardamos CartItem!
   private items: CartItem[] = [];
   private cartCount = new BehaviorSubject<number>(0);
+  private storageKey = 'my-shop-cart'; // Chave para salvar no navegador
 
-  constructor() { }
+  constructor() {
+    // 1. Ao iniciar o serviço, tenta recuperar o carrinho salvo
+    this.loadCartFromStorage();
+  }
 
   addToCart(product: Product) {
-    // Verifica se já tem esse produto no carrinho
     const existingItem = this.items.find(i => i.product.id === product.id);
 
     if (existingItem) {
-      // Se já tem, só aumenta a quantidade
       existingItem.quantity++;
     } else {
-      // Se não tem, adiciona novo com quantidade 1
       this.items.push({ product: product, quantity: 1 });
     }
 
-    // Atualiza o contador (soma das quantidades ou número de itens únicos?
-    // Shopee costuma mostrar número de itens únicos, mas vamos somar tudo para dar sensação de volume)
     this.updateCount();
-    console.log('Carrinho atual:', this.items);
+    this.saveCartToStorage(); // <--- Salva após alterar
   }
 
-  // Método auxiliar para atualizar o contador total
-  private updateCount() {
-    const totalCount = this.items.reduce((sum, item) => sum + item.quantity, 0);
-    this.cartCount.next(totalCount);
+  decreaseQuantity(productId: string) {
+    const item = this.items.find(i => i.product.id === productId);
+    if (item) {
+      item.quantity--;
+      if (item.quantity <= 0) {
+        this.removeItem(productId);
+      } else {
+        this.updateCount();
+        this.saveCartToStorage(); // <--- Salva após alterar
+      }
+    }
   }
 
-  getCount() {
-    return this.cartCount.asObservable();
+  removeItem(productId: string) {
+    this.items = this.items.filter(item => item.product.id !== productId);
+    this.updateCount();
+    this.saveCartToStorage(); // <--- Salva após alterar
+  }
+
+  clearCart() {
+    this.items = [];
+    this.updateCount();
+    this.saveCartToStorage(); // <--- Salva (limpa) o storage
   }
 
   getItems() {
     return this.items;
   }
 
-  clearCart() {
-    this.items = [];
-    this.cartCount.next(0);
+  getTotal(): number {
+    return this.items.reduce((acc, item) => acc + (item.product.price * item.quantity), 0);
+  }
+
+  getCount() {
+    return this.cartCount.asObservable();
+  }
+
+  private updateCount() {
+    const totalCount = this.items.reduce((sum, item) => sum + item.quantity, 0);
+    this.cartCount.next(totalCount);
+  }
+
+  // --- NOVOS MÉTODOS DE PERSISTÊNCIA ---
+
+  // Salva o array atual no LocalStorage do navegador
+  private saveCartToStorage() {
+    localStorage.setItem(this.storageKey, JSON.stringify(this.items));
+  }
+
+  // Recupera do LocalStorage e preenche a memória
+  private loadCartFromStorage() {
+    const storedCart = localStorage.getItem(this.storageKey);
+    if (storedCart) {
+      try {
+        this.items = JSON.parse(storedCart);
+        this.updateCount(); // Atualiza a bolinha vermelha
+      } catch (error) {
+        console.error('Erro ao carregar carrinho:', error);
+        this.items = [];
+      }
+    }
   }
 }
