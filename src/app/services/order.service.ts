@@ -47,7 +47,7 @@ export class OrderService {
   // ==========================================
 
   getAllOrders(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.baseUrl}/admin/orders/all`);
+    return this.http.get<any[]>(`${this.baseUrl}/admin/orders`);
   }
 
   updateStatus(orderId: string, status: string): Observable<any> {

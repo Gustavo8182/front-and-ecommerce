@@ -1,0 +1,50 @@
+<div class="container mt-4 mb-5" style="max-width: 600px;">
+  <div class="card shadow-sm">
+    <div class="card-header bg-primary text-white">
+      <h4 class="mb-0">
+        <i class="bi" [ngClass]="isEditMode ? 'bi-pencil-square' : 'bi-plus-circle'"></i>
+        {{ isEditMode ? 'Editar Produto' : 'Novo Produto' }}
+      </h4>
+    </div>
+    <div class="card-body">
+
+      <form [formGroup]="form" (ngSubmit)="onSubmit()">
+
+        <div class="mb-3">
+          <label class="form-label">Nome do Produto</label>
+          <input type="text" class="form-control" formControlName="name" placeholder="Ex: Notebook Gamer">
+        </div>
+
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Preço (R$)</label>
+            <input type="number" class="form-control" formControlName="price">
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Estoque (Qtd)</label>
+            <input type="number" class="form-control" formControlName="quantityStock">
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">URL da Imagem</label>
+          <input type="text" class="form-control" formControlName="imageUrl" placeholder="http://...">
+          <div class="form-text">Cole um link de imagem da internet.</div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Descrição</label>
+          <textarea class="form-control" formControlName="description" rows="3"></textarea>
+        </div>
+
+        <div class="d-flex justify-content-end gap-2">
+          <a routerLink="/admin/products" class="btn btn-secondary">Cancelar</a>
+          <button type="submit" class="btn btn-primary" [disabled]="form.invalid">
+            {{ isEditMode ? 'Salvar Alterações' : 'Cadastrar Produto' }}
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>

@@ -7,6 +7,8 @@ import { SearchResultsComponent } from './pages/search-results/search-results.co
 import { ProductDetailsComponent } from './pages/product-details/product-details.component';
 import { CartComponent } from './pages/cart/cart.component';
 import { AdminOrdersComponent } from './pages/admin-orders/admin-orders.component';
+import { AdminProductsComponent } from './pages/admin-products/admin-products.component';
+import { ProductFormComponent } from './pages/product-form/product-form.component';
 
 export const routes: Routes = [
     { path: '', component: ProductListComponent },
@@ -16,5 +18,8 @@ export const routes: Routes = [
     { path: 'search', component: SearchResultsComponent },
     { path: 'product/:id', component: ProductDetailsComponent },
     { path: 'cart', component: CartComponent },
-    { path: 'admin/orders', component: AdminOrdersComponent }
+    { path: 'admin/orders', component: AdminOrdersComponent },
+    { path: 'admin/products', component: AdminProductsComponent },
+    { path: 'admin/products/new', component: ProductFormComponent },
+    { path: 'admin/products/:id', component: ProductFormComponent }
 ];
