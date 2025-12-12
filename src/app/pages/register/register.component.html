@@ -1,0 +1,31 @@
+<div class="container d-flex justify-content-center align-items-center vh-100">
+  <div class="card p-4 shadow-lg" style="width: 400px;">
+    <div class="text-center mb-4">
+      <i class="bi bi-person-plus-fill display-1 text-success"></i>
+      <h3 class="mt-3">Crie sua Conta</h3>
+    </div>
+
+    <form (ngSubmit)="onSubmit()">
+      <div class="mb-3">
+        <label for="email" class="form-label">Email</label>
+        <input type="email" class="form-control" id="email"
+               [(ngModel)]="registerData.login" name="login" required>
+      </div>
+
+      <div class="mb-3">
+        <label for="password" class="form-label">Senha</label>
+        <input type="password" class="form-control" id="password"
+               [(ngModel)]="registerData.password" name="password" required>
+      </div>
+
+      <button type="submit" class="btn btn-success w-100 mb-3" [disabled]="isLoading">
+        <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2"></span>
+        Cadastrar
+      </button>
+
+      <div class="text-center">
+        <a routerLink="/login" class="text-decoration-none text-muted">Já tem conta? Faça Login</a>
+      </div>
+    </form>
+  </div>
+</div>
