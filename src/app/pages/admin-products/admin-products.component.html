@@ -22,8 +22,8 @@
           <tbody>
             <tr *ngFor="let product of products">
               <td class="ps-4">
-                <img [src]="product.imageUrl || 'assets/placeholder.png'"
-                     alt="Prod"
+                <img (error)="product.imageUrl = 'assets/img/sem-foto.jpg'"
+                    alt="Prod"
                      class="img-thumbnail"
                      style="width: 50px; height: 50px; object-fit: cover;">
               </td>
