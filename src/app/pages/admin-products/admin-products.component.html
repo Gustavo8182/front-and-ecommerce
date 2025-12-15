@@ -21,26 +21,30 @@
           </thead>
           <tbody>
             <tr *ngFor="let product of products">
+
               <td class="ps-4">
-                <img (error)="product.imageUrl = 'assets/img/sem-foto.jpg'"
-                    alt="Prod"
+                <img [src]="getMainImage(product)"
+                     (error)="product.images[0].imageUrl = 'assets/img/sem-foto.jpg'"
+                     alt="Prod"
                      class="img-thumbnail"
                      style="width: 50px; height: 50px; object-fit: cover;">
               </td>
 
               <td>
                 <span class="fw-bold">{{ product.name }}</span><br>
-                <small class="text-muted" style="font-size: 0.75rem">ID: {{ product.id | slice:0:8 }}...</small>
+                <small class="text-muted">{{ product.brand }}</small>
+                <small class="text-muted ms-2" style="font-size: 0.70rem">ID: {{ product.id | slice:0:8 }}...</small>
               </td>
 
               <td class="text-success fw-bold">
-                {{ product.price | currency:'BRL' }}
+                <small class="text-muted fw-normal" style="font-size: 0.8rem">A partir de </small>
+                {{ getMinPrice(product) | currency:'BRL' }}
               </td>
 
               <td>
                 <span class="badge"
-                      [ngClass]="product.quantityStock > 5 ? 'bg-secondary' : 'bg-danger'">
-                  {{ product.quantityStock }} un
+                      [ngClass]="getTotalStock(product) > 5 ? 'bg-secondary' : 'bg-danger'">
+                  {{ getTotalStock(product) }} un
                 </span>
               </td>
 

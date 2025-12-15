@@ -2,9 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ProductService } from '../../services/product.service';
-import { CartService } from '../../services/cart.service';
 import { Product } from '../../models/product.model';
 import { Router, RouterModule } from '@angular/router';
+
 
 @Component({
   selector: 'app-product-list',
@@ -25,7 +25,7 @@ export class ProductListComponent implements OnInit {
 
 constructor(
     private productService: ProductService,
-    private cartService: CartService,
+
     private router: Router
   ) {}
 
@@ -45,10 +45,7 @@ constructor(
     window.open(url, '_blank');
   }
 
-  addToCart(product: Product) {
-    this.cartService.addToCart(product);
-    alert(`Produto "${product.name}" adicionado ao carrinho!`);
-  }
+
 
   // Agora o método aceita o número da página
   loadProducts(page: number) {
@@ -63,6 +60,7 @@ constructor(
         console.error('Erro ao carregar produtos:', error);
       }
     });
+
   }
 
   // Método chamado pelos botões do HTML
@@ -79,4 +77,32 @@ constructor(
       this.onSearch();        // Chama a busca
     }
   }
+
+// --- MÉTODOS VISUAIS ---
+
+
+  // 1. Pega a Imagem de Capa (Main) ou a primeira que encontrar
+  getMainImage(product: Product): string {
+    if (!product.images || product.images.length === 0) {
+      return 'assets/img/sem-foto.jpg'; // Crie uma imagem padrão para fallback
+    }
+
+    // Tenta achar a marcada como main: true
+    const mainImg = product.images.find(img => img.main);
+
+    // Se achar retorna ela, senão retorna a primeira da lista
+    return mainImg ? mainImg.imageUrl : product.images[0].imageUrl;
+  }
+
+  // 2. Pega o "Menor Preço" entre as variações para exibir "A partir de..."
+  getDisplayPrice(product: Product): number {
+    if (!product.variations || product.variations.length === 0) {
+      return 0;
+    }
+
+    // Matemática simples para achar o menor valor no array de variações
+    const prices = product.variations.map(v => v.price);
+    return Math.min(...prices);
+  }
+
 }

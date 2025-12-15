@@ -32,7 +32,7 @@ export class CartComponent implements OnInit {
   };
   // -----------------------------
 
-constructor(
+  constructor(
     private cartService: CartService,
     private authService: AuthService,
     private orderService: OrderService,
@@ -40,8 +40,14 @@ constructor(
     private router: Router
   ) {}
 
-ngOnInit(): void {
+  ngOnInit(): void {
     this.loadCart();
+
+    // Inscreve-se para saber se o carrinho mudou (atualiza total em tempo real)
+    this.cartService.getCount().subscribe(() => {
+      this.loadCart();
+    });
+
     this.authService.isLoggedIn().subscribe((res: boolean) => {
       this.isLogged = res;
       if (this.isLogged) {
@@ -66,7 +72,8 @@ ngOnInit(): void {
         } else {
           this.showAddressForm = true; // Se não tiver, abre o formulário
         }
-      }
+      },
+      error: (err) => console.error('Erro ao carregar endereços', err)
     });
   }
 
@@ -83,29 +90,43 @@ ngOnInit(): void {
     });
   }
 
-  // ---------------------------
+  // --- MÉTODOS DE AÇÃO (Usam o ID da Variação agora) ---
 
-
-  // Aumentar quantidade (+)
-increase(item: CartItem) {
-    this.cartService.addToCart(item.product);
-    this.loadCart();// Recarrega para atualizar totais
+  increase(item: CartItem) {
+    // Adiciona o mesmo produto e variação
+    this.cartService.addToCart(item.product, item.variation);
+    this.total = this.cartService.getTotal();
   }
 
-  // Diminuir quantidade (-)
-decrease(item: CartItem) {
-    this.cartService.decreaseQuantity(item.product.id);
-    this.loadCart();
+  decrease(item: CartItem) {
+    this.cartService.decreaseQuantity(item.variation.id); // <--- ID DA VARIAÇÃO
+    this.cartItems = this.cartService.getItems();
+    this.total = this.cartService.getTotal();
   }
 
-  // Remover item (Lixeira)
-remove(item: CartItem) {
-    this.cartService.removeItem(item.product.id);
-    this.loadCart();
+  remove(item: CartItem) {
+    this.cartService.removeItem(item.variation.id); // <--- ID DA VARIAÇÃO
+    this.cartItems = this.cartService.getItems();
+    this.total = this.cartService.getTotal();
   }
 
-  // Finalizar Compra (Checkout Real)
-checkout() {
+  // --- AUXILIAR VISUAL ---
+
+  getItemImage(item: CartItem): string {
+    // 1. Tenta imagem da variação
+    if (item.variation.imageUrl) return item.variation.imageUrl;
+
+    // 2. Tenta imagem principal do produto
+    if (item.product.images && item.product.images.length > 0) {
+      const main = item.product.images.find(i => i.main);
+      return main ? main.imageUrl : item.product.images[0].imageUrl;
+    }
+
+    return 'assets/img/sem-foto.jpg';
+  }
+
+  // --- CHECKOUT (CORRIGIDO) ---
+  checkout() {
     if (!this.isLogged) {
       alert('Por favor, faça login.');
       this.router.navigate(['/login']);
@@ -119,16 +140,28 @@ checkout() {
       return;
     }
 
-  // Agora passamos o ID do endereço
-    this.orderService.createOrder(this.cartItems, this.selectedAddressId).subscribe({
+    // 1. Monta o Objeto DTO exatamente como o Java espera
+    const orderData = {
+      addressId: this.selectedAddressId,
+      items: this.cartItems.map(item => ({
+        variationId: item.variation.id, // <--- O PULO DO GATO: Envia o ID da Variação
+        quantity: item.quantity
+      }))
+    };
+
+    console.log('Enviando Pedido:', orderData);
+
+    // 2. Envia para o serviço
+    this.orderService.createOrder(orderData).subscribe({
       next: (order) => {
-        alert('Pedido #' + order.id + ' realizado com sucesso!');
+        alert('Pedido realizado com sucesso!');
         this.cartService.clearCart();
-        this.router.navigate(['/my-orders']);
+        // Redireciona para "Meus Pedidos" ou Home
+        this.router.navigate(['/orders']);
       },
       error: (err) => {
         console.error(err);
-        alert('Erro ao processar pedido.');
+        alert('Erro ao processar pedido. Verifique o console.');
       }
     });
   }

@@ -1,4 +1,4 @@
-<div class="container mt-5">
+<div class="container mt-5 mb-5">
 
   <div *ngIf="isLoading" class="text-center py-5">
     <div class="spinner-border text-primary" role="status">
@@ -8,23 +8,57 @@
 
   <div *ngIf="product" class="row">
 
-    <div class="col-md-6 mb-4 d-flex justify-content-center align-items-center bg-white rounded shadow-sm p-3">
-        <img [src]="product.imageUrl"
+    <div class="col-md-6 mb-4">
+      <div class="bg-white rounded shadow-sm p-3 text-center mb-3">
+        <img [src]="currentImage"
              [alt]="product.name"
-             (error)="product.imageUrl = ''"
              class="img-fluid"
              style="max-height: 400px; object-fit: contain;">
 
-        <i *ngIf="!product.imageUrl" class="bi bi-box-seam display-1 text-secondary"></i>
+        <i *ngIf="!currentImage" class="bi bi-box-seam display-1 text-secondary"></i>
+      </div>
+
+      <div class="d-flex gap-2 justify-content-center overflow-auto">
+        <div *ngFor="let img of product.images"
+             class="border rounded p-1"
+             style="cursor: pointer; width: 60px; height: 60px;"
+             [class.border-primary]="currentImage === img.imageUrl"
+             (click)="changeImage(img.imageUrl)">
+          <img [src]="img.imageUrl" class="img-fluid h-100 w-100" style="object-fit: contain;">
+        </div>
+      </div>
     </div>
 
     <div class="col-md-6">
-      <h1 class="fw-bold">{{ product.name }}</h1>
-      <p class="text-muted mb-4">Código: {{ product.id }}</p>
+      <small class="text-muted">{{ product.category?.name || 'Geral' }}</small>
+      <h1 class="fw-bold mb-2">{{ product.name }}</h1>
+      <p class="text-muted mb-4">Marca: {{ product.brand }}</p>
 
-      <h2 class="text-success fw-bold display-5 mb-3">
-        {{ product.price | currency:'BRL' }}
-      </h2>
+      <div *ngIf="selectedVariation">
+        <h2 class="text-success fw-bold display-5 mb-0">
+          {{ selectedVariation.price | currency:'BRL' }}
+        </h2>
+        <small class="text-muted">À vista ou parcelado</small>
+      </div>
+
+      <hr class="my-4">
+
+      <div class="mb-4">
+        <h6 class="fw-bold mb-3">Escolha a opção:</h6>
+        <div class="d-flex flex-wrap gap-2">
+          <button *ngFor="let v of product.variations"
+                  class="btn"
+                  [class.btn-primary]="selectedVariation?.id === v.id"
+                  [class.btn-outline-secondary]="selectedVariation?.id !== v.id"
+                  (click)="selectVariation(v)">
+            {{ v.name }}
+          </button>
+        </div>
+
+        <div *ngIf="selectedVariation" class="mt-2 text-muted small">
+          Estoque disponível: {{ selectedVariation.quantityStock }} unidades
+        </div>
+      </div>
 
       <div class="card bg-light border-0 mb-4">
         <div class="card-body">
@@ -33,14 +67,12 @@
         </div>
       </div>
 
-      <p class="mb-4">
-        <span class="badge bg-success me-2"><i class="bi bi-truck"></i> Frete Grátis</span>
-        <span class="badge bg-info text-dark"><i class="bi bi-shield-check"></i> Compra Garantida</span>
-      </p>
-
       <div class="d-grid gap-2">
-        <button class="btn btn-primary btn-lg" (click)="addToCart()">
-          <i class="bi bi-cart-plus"></i> Adicionar ao Carrinho
+        <button class="btn btn-primary btn-lg"
+                (click)="addToCart()"
+                [disabled]="!selectedVariation || selectedVariation.quantityStock === 0">
+          <i class="bi bi-cart-plus"></i>
+          {{ selectedVariation?.quantityStock === 0 ? 'Indisponível' : 'Adicionar ao Carrinho' }}
         </button>
         <a routerLink="/" class="btn btn-outline-secondary">Continuar Comprando</a>
       </div>

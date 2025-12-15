@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { Product, CartItem } from '../models/product.model';
+import { Product, CartItem, ProductVariation } from '../models/product.model';
 
 @Injectable({
   providedIn: 'root'
@@ -9,57 +9,65 @@ export class CartService {
 
   private items: CartItem[] = [];
   private cartCount = new BehaviorSubject<number>(0);
-  private storageKey = 'my-shop-cart'; // Chave para salvar no navegador
+  private storageKey = 'my-shop-cart';
 
   constructor() {
-    // 1. Ao iniciar o serviço, tenta recuperar o carrinho salvo
     this.loadCartFromStorage();
   }
 
-  addToCart(product: Product) {
-    const existingItem = this.items.find(i => i.product.id === product.id);
+  // MUDANÇA CRÍTICA: Agora precisamos saber QUAL variação foi comprada
+  addToCart(product: Product, variation: ProductVariation) {
+    // Procura se já existe essa VARIAÇÃO específica no carrinho
+    const existingItem = this.items.find(i => i.variation.id === variation.id);
 
     if (existingItem) {
       existingItem.quantity++;
     } else {
-      this.items.push({ product: product, quantity: 1 });
+      this.items.push({
+        product: product,
+        variation: variation, // Salvamos a variação escolhida
+        quantity: 1
+      });
     }
 
     this.updateCount();
-    this.saveCartToStorage(); // <--- Salva após alterar
+    this.saveCartToStorage();
   }
 
-  decreaseQuantity(productId: string) {
-    const item = this.items.find(i => i.product.id === productId);
+  // MUDANÇA: Diminuir quantidade baseado no ID da VARIAÇÃO
+  decreaseQuantity(variationId: string) {
+    const item = this.items.find(i => i.variation.id === variationId);
     if (item) {
       item.quantity--;
       if (item.quantity <= 0) {
-        this.removeItem(productId);
+        this.removeItem(variationId);
       } else {
         this.updateCount();
-        this.saveCartToStorage(); // <--- Salva após alterar
+        this.saveCartToStorage();
       }
     }
   }
 
-  removeItem(productId: string) {
-    this.items = this.items.filter(item => item.product.id !== productId);
+  // MUDANÇA: Remover baseado no ID da VARIAÇÃO
+  removeItem(variationId: string) {
+    this.items = this.items.filter(item => item.variation.id !== variationId);
     this.updateCount();
-    this.saveCartToStorage(); // <--- Salva após alterar
+    this.saveCartToStorage();
   }
 
   clearCart() {
     this.items = [];
     this.updateCount();
-    this.saveCartToStorage(); // <--- Salva (limpa) o storage
+    this.saveCartToStorage();
   }
 
   getItems() {
     return this.items;
   }
 
+  // MUDANÇA: O Preço agora vem da variação
   getTotal(): number {
-    return this.items.reduce((acc, item) => acc + (item.product.price * item.quantity), 0);
+    return this.items.reduce((acc, item) => acc + (item.variation.price * item.quantity), 0);
   }
 
   getCount() {
@@ -71,20 +79,16 @@ export class CartService {
     this.cartCount.next(totalCount);
   }
 
-  // --- NOVOS MÉTODOS DE PERSISTÊNCIA ---
-
-  // Salva o array atual no LocalStorage do navegador
   private saveCartToStorage() {
     localStorage.setItem(this.storageKey, JSON.stringify(this.items));
   }
 
-  // Recupera do LocalStorage e preenche a memória
   private loadCartFromStorage() {
     const storedCart = localStorage.getItem(this.storageKey);
     if (storedCart) {
       try {
         this.items = JSON.parse(storedCart);
-        this.updateCount(); // Atualiza a bolinha vermelha
+        this.updateCount();
       } catch (error) {
         console.error('Erro ao carregar carrinho:', error);
         this.items = [];

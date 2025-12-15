@@ -1,0 +1,15 @@
+/* Apenas um ajuste fino para o hover ficar agradável */
+.card {
+  transition: transform 0.2s;
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
+  }
+}
+
+.card-title {
+  text-decoration: none;
+  &:hover {
+    text-decoration: underline;
+  }
+}

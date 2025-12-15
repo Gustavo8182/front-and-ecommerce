@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ProductService } from '../../services/product.service';
-import { CartService } from '../../services/cart.service';
 import { Product } from '../../models/product.model';
 
 @Component({
@@ -19,12 +18,11 @@ export class SearchResultsComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
-    private productService: ProductService,
-    private cartService: CartService
+    private productService: ProductService
+    // private cartService: CartService <--- REMOVIDO: Não adicionamos ao carrinho daqui
   ) {}
 
   ngOnInit(): void {
-    // Lê o parâmetro 'q' da URL
     this.route.queryParams.subscribe(params => {
       this.searchTerm = params['q'] || '';
       this.doSearch(this.searchTerm);
@@ -32,7 +30,6 @@ export class SearchResultsComponent implements OnInit {
   }
 
   doSearch(query: string) {
-    // Chama o serviço passando a busca (página 0, tamanho 50 para trazer bastante coisa)
     this.productService.getProducts(0, 50, query).subscribe({
       next: (res) => {
         this.products = res.content;
@@ -41,8 +38,23 @@ export class SearchResultsComponent implements OnInit {
     });
   }
 
-  addToCart(product: Product) {
-    this.cartService.addToCart(product);
-    alert(`Produto "${product.name}" adicionado!`);
+  // --- MÉTODOS DE VISUALIZAÇÃO ---
+
+  // 1. Pega a imagem principal
+  getMainImage(product: any): string {
+    if (product.images && product.images.length > 0) {
+      const mainImg = product.images.find((i: any) => i.main);
+      return mainImg ? mainImg.imageUrl : product.images[0].imageUrl;
+    }
+    return '';
+  }
+
+  // 2. Pega o menor preço para exibir "A partir de R$..."
+  getDisplayPrice(product: any): number {
+    if (product.variations && product.variations.length > 0) {
+      const prices = product.variations.map((v: any) => v.price);
+      return Math.min(...prices);
+    }
+    return 0;
   }
 }

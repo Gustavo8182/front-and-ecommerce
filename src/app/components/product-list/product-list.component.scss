@@ -1,0 +1,66 @@
+/* product-list.component.scss */
+
+.product-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+  border: 1px solid #eee;
+  overflow: hidden; /* Garante que nada saia do card */
+
+  &:hover {
+    transform: translateY(-5px); // Sobe um pouquinho
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important; // Sombra suave
+    border-color: #0d6efd; // Borda azul ao passar o mouse
+  }
+
+  /* Área da Imagem */
+  .img-wrapper {
+    height: 220px; /* Altura fixa para alinhar os cards */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #fff;
+    padding: 1rem;
+    position: relative;
+    border-bottom: 1px solid #f0f0f0;
+
+    img {
+      max-height: 100%;
+      max-width: 100%;
+      object-fit: contain; /* Garante que a imagem não distorça */
+      transition: transform 0.3s;
+    }
+
+    /* Ícone de fallback quando não tem foto */
+    .no-photo {
+      color: #ccc;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+
+  /* Efeito de zoom na imagem ao passar o mouse no card */
+  &:hover .img-wrapper img {
+    transform: scale(1.05);
+  }
+
+  .card-body {
+    display: flex;
+    flex-direction: column;
+    padding: 1.25rem;
+  }
+
+  .category-badge {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+  }
+
+  .price-tag {
+    font-family: 'Arial', sans-serif; // Ou a fonte do seu projeto
+    font-weight: 700;
+    color: #198754; // Verde Sucesso
+  }
+}
