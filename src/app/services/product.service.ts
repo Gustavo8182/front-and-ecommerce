@@ -1,4 +1,4 @@
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Product, ProductResponse } from '../models/product.model';
@@ -19,7 +19,7 @@ export class ProductService {
     let params = new HttpParams()
       .set('page', page.toString())
       .set('size', size.toString())
-      .set('sort', 'id,asc'); // ou 'name,asc' se preferir
+      .set('sort', 'id,asc');
 
     if (search) {
       params = params.set('search', search);
@@ -34,15 +34,30 @@ export class ProductService {
 
   // --- ESCRITA (Admin - Requer Token) ---
 
-  createProduct(product: Product): Observable<Product> {
-    return this.http.post<Product>(this.apiUrl, product);
+ createProduct(product: any): Observable<any> {
+    const token = localStorage.getItem('auth-token');
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+
+    return this.http.post(this.apiUrl, product, { headers });
   }
 
-  updateProduct(id: string, product: Product): Observable<Product> {
-    return this.http.put<Product>(`${this.apiUrl}/${id}`, product);
+  updateProduct(id: string, product: any): Observable<any> {
+    const token = localStorage.getItem('auth-token');
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+
+    return this.http.put(`${this.apiUrl}/${id}`, product, { headers });
   }
 
   deleteProduct(id: string): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/${id}`);
+    const token = localStorage.getItem('auth-token');
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+
+    return this.http.delete(`${this.apiUrl}/${id}`, { headers });
   }
 }

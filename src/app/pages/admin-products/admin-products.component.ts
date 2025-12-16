@@ -45,4 +45,30 @@ export class AdminProductsComponent implements OnInit {
       });
     }
   }
+
+  // 1. Pega a imagem principal (ou a primeira, ou uma padrão)
+  getMainImage(product: any): string {
+    if (product.images && product.images.length > 0) {
+      const mainImg = product.images.find((i: any) => i.main);
+      return mainImg ? mainImg.imageUrl : product.images[0].imageUrl;
+    }
+    return 'assets/img/sem-foto.jpg';
+  }
+
+  // 2. Calcula o menor preço entre as variações para exibir "A partir de..."
+  getMinPrice(product: any): number {
+    if (product.variations && product.variations.length > 0) {
+      const prices = product.variations.map((v: any) => v.price);
+      return Math.min(...prices);
+    }
+    return 0;
+  }
+
+  // 3. Soma o estoque total de todas as variações
+  getTotalStock(product: any): number {
+    if (product.variations && product.variations.length > 0) {
+      return product.variations.reduce((acc: number, curr: any) => acc + curr.quantityStock, 0);
+    }
+    return 0;
+  }
 }

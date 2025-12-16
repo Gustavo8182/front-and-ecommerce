@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, RouterModule } from '@angular/router'; // Para ler a URL
+import { ActivatedRoute, RouterModule } from '@angular/router';
 import { ProductService } from '../../services/product.service';
 import { CartService } from '../../services/cart.service';
-import { Product } from '../../models/product.model';
+import { Product, ProductVariation } from '../../models/product.model'; // Importe ProductVariation
 
 @Component({
   selector: 'app-product-details',
@@ -15,6 +15,8 @@ import { Product } from '../../models/product.model';
 export class ProductDetailsComponent implements OnInit {
 
   product: Product | null = null;
+  selectedVariation: ProductVariation | null = null; // Guarda a escolha do usuário
+  currentImage: string = ''; // Guarda a imagem que está aparecendo na tela grande
   isLoading: boolean = true;
 
   constructor(
@@ -24,7 +26,6 @@ export class ProductDetailsComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // Pega o ID da URL (ex: /product/123 -> id = 123)
     const id = this.route.snapshot.paramMap.get('id');
 
     if (id) {
@@ -32,6 +33,18 @@ export class ProductDetailsComponent implements OnInit {
         next: (data) => {
           this.product = data;
           this.isLoading = false;
+
+          // LOGICA DE AUTO-SELEÇÃO:
+          // Se tiver imagens, define a principal como capa inicial
+          if (this.product.images && this.product.images.length > 0) {
+            const mainImg = this.product.images.find(i => i.main);
+            this.currentImage = mainImg ? mainImg.imageUrl : this.product.images[0].imageUrl;
+          }
+
+          // Se tiver variações, seleciona a primeira automaticamente
+          if (this.product.variations && this.product.variations.length > 0) {
+            this.selectVariation(this.product.variations[0]);
+          }
         },
         error: (err) => {
           console.error(err);
@@ -41,10 +54,28 @@ export class ProductDetailsComponent implements OnInit {
     }
   }
 
+  // Método chamado quando o usuário clica num botão de variação
+  selectVariation(variation: ProductVariation) {
+    this.selectedVariation = variation;
+
+    // Se a variação tem foto específica (ex: celular azul), troca a imagem principal
+    if (variation.imageUrl) {
+      this.currentImage = variation.imageUrl;
+    }
+  }
+
+  // Método para trocar imagem ao clicar nas miniaturas (Thumbnails)
+  changeImage(url: string) {
+    this.currentImage = url;
+  }
+
   addToCart() {
-    if (this.product) {
-      this.cartService.addToCart(this.product);
-      alert(`Produto "${this.product.name}" adicionado ao carrinho!`);
+    if (this.product && this.selectedVariation) {
+      // CORREÇÃO DO ERRO: Passamos o Produto E a Variação
+      this.cartService.addToCart(this.product, this.selectedVariation);
+      alert(`Produto "${this.product.name}" (${this.selectedVariation.name}) adicionado!`);
+    } else {
+      alert('Por favor, selecione uma opção.');
     }
   }
 }
