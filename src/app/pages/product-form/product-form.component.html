@@ -1,50 +1,170 @@
-<div class="container mt-4 mb-5" style="max-width: 600px;">
-  <div class="card shadow-sm">
-    <div class="card-header bg-primary text-white">
-      <h4 class="mb-0">
-        <i class="bi" [ngClass]="isEditMode ? 'bi-pencil-square' : 'bi-plus-circle'"></i>
-        {{ isEditMode ? 'Editar Produto' : 'Novo Produto' }}
-      </h4>
-    </div>
-    <div class="card-body">
-
-      <form [formGroup]="form" (ngSubmit)="onSubmit()">
-
-        <div class="mb-3">
-          <label class="form-label">Nome do Produto</label>
-          <input type="text" class="form-control" formControlName="name" placeholder="Ex: Notebook Gamer">
-        </div>
-
-        <div class="row">
-          <div class="col-md-6 mb-3">
-            <label class="form-label">Preço (R$)</label>
-            <input type="number" class="form-control" formControlName="price">
-          </div>
-          <div class="col-md-6 mb-3">
-            <label class="form-label">Estoque (Qtd)</label>
-            <input type="number" class="form-control" formControlName="quantityStock">
-          </div>
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label">URL da Imagem</label>
-          <input type="text" class="form-control" formControlName="imageUrl" placeholder="http://...">
-          <div class="form-text">Cole um link de imagem da internet.</div>
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label">Descrição</label>
-          <textarea class="form-control" formControlName="description" rows="3"></textarea>
-        </div>
-
-        <div class="d-flex justify-content-end gap-2">
-          <a routerLink="/admin/products" class="btn btn-secondary">Cancelar</a>
-          <button type="submit" class="btn btn-primary" [disabled]="form.invalid">
-            {{ isEditMode ? 'Salvar Alterações' : 'Cadastrar Produto' }}
-          </button>
-        </div>
-
-      </form>
-    </div>
+<div class="container mt-4 mb-5">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>{{ isEditMode ? 'Editar' : 'Novo' }} Produto</h2>
+    <a routerLink="/admin/products" class="btn btn-outline-secondary">Cancelar</a>
   </div>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+
+    <div class="card shadow-sm mb-4">
+      <div class="card-header bg-white fw-bold">Dados Básicos</div>
+      <div class="card-body">
+        <div class="row g-3">
+
+          <div class="col-md-8">
+            <label class="form-label">Nome do Produto *</label>
+            <input type="text" class="form-control" formControlName="name" placeholder="Ex: Notebook Gamer">
+          </div>
+
+<div class="col-md-4">
+            <label class="form-label">Categoria *</label>
+
+            <select *ngIf="!isCreatingCategory"
+                    class="form-select"
+                    formControlName="categoryId"
+                    (change)="onCategoryChange($event)"> <option [ngValue]="null" disabled>Selecione...</option>
+
+              <option *ngFor="let cat of categories" [value]="cat.id">
+                {{ cat.name }}
+              </option>
+
+              <option value="NEW" class="fw-bold text-primary">
+                + Cadastrar Nova Categoria...
+              </option>
+            </select>
+
+            <div *ngIf="isCreatingCategory" class="input-group">
+              <input type="text" class="form-control"
+                     placeholder="Nome da nova categoria"
+                     [(ngModel)]="newCategoryName"
+                     [ngModelOptions]="{standalone: true}"
+                     autofocus> <button class="btn btn-success" type="button"
+                      (click)="saveNewCategory()"
+                      [disabled]="isSavingCategory || !newCategoryName">
+                <i class="bi bi-check-lg"></i>
+              </button>
+
+              <button class="btn btn-outline-secondary" type="button"
+                      (click)="cancelNewCategory()">
+                <i class="bi bi-x-lg"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Marca</label>
+            <input type="text" class="form-control" formControlName="brand">
+          </div>
+
+          <div class="col-12">
+            <label class="form-label">Descrição Completa</label>
+            <textarea class="form-control" rows="3" formControlName="description"></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+      <div class="card-header bg-white fw-bold d-flex justify-content-between align-items-center">
+        <span>Imagens do Produto</span>
+        <button type="button" class="btn btn-sm btn-outline-primary" (click)="addImage()">
+          <i class="bi bi-plus-lg"></i> Adicionar URL
+        </button>
+      </div>
+      <div class="card-body">
+
+        <div formArrayName="images">
+          <div *ngFor="let imgCtrl of imagesArray.controls; let i = index" [formGroupName]="i" class="row g-2 mb-2 align-items-center">
+
+            <div class="col-md-1 text-center">
+              <div class="form-check form-switch d-flex justify-content-center">
+                <input class="form-check-input" type="radio" name="mainImage"
+                       [checked]="imgCtrl.get('main')?.value"
+                       (change)="setMainImage(i)"
+                       title="Definir como capa">
+              </div>
+            </div>
+
+            <div class="col-md-9">
+              <input type="text" class="form-control" formControlName="imageUrl" placeholder="http://link-da-imagem.jpg">
+            </div>
+
+            <div class="col-md-2 text-end">
+              <button type="button" class="btn btn-outline-danger" (click)="removeImage(i)" [disabled]="imagesArray.length === 1">
+                <i class="bi bi-trash"></i>
+              </button>
+            </div>
+
+            <div class="col-12 text-center" *ngIf="imgCtrl.get('imageUrl')?.value">
+               <img [src]="imgCtrl.get('imageUrl')?.value" style="height: 60px; object-fit: contain;" class="mt-1 border rounded p-1">
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="card shadow-sm mb-4 border-primary">
+      <div class="card-header bg-primary text-white fw-bold d-flex justify-content-between align-items-center">
+        <span>Variações (Preço e Estoque)</span>
+        <button type="button" class="btn btn-sm btn-light text-primary" (click)="addVariation()">
+          <i class="bi bi-plus-lg"></i> Nova Variação
+        </button>
+      </div>
+      <div class="card-body p-0">
+
+        <div class="table-responsive">
+          <table class="table table-hover mb-0 align-middle">
+            <thead class="bg-light">
+              <tr>
+                <th style="width: 30%">Nome (Cor/Tamanho) *</th>
+                <th style="width: 20%">Preço (R$) *</th>
+                <th style="width: 15%">Estoque *</th>
+                <th style="width: 20%">SKU/Cód</th>
+                <th style="width: 5%"></th>
+              </tr>
+            </thead>
+            <tbody formArrayName="variations">
+              <tr *ngFor="let varCtrl of variationsArray.controls; let i = index" [formGroupName]="i">
+
+                <td>
+                  <input type="text" class="form-control" formControlName="name" placeholder="Ex: Azul - M">
+                </td>
+
+                <td>
+                  <div class="input-group">
+                    <span class="input-group-text">R$</span>
+                    <input type="number" class="form-control" formControlName="price">
+                  </div>
+                </td>
+
+                <td>
+                  <input type="number" class="form-control" formControlName="quantityStock">
+                </td>
+
+                <td>
+                  <input type="text" class="form-control" formControlName="sku" placeholder="COD-01">
+                </td>
+
+                <td class="text-end">
+                  <button type="button" class="btn btn-sm btn-outline-danger" (click)="removeVariation(i)" [disabled]="variationsArray.length === 1">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+      <button type="submit" class="btn btn-success btn-lg px-5" [disabled]="form.invalid">
+        <i class="bi bi-check-lg"></i> Salvar Produto Completo
+      </button>
+    </div>
+
+  </form>
 </div>
