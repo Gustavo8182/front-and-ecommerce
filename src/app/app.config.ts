@@ -2,7 +2,7 @@ import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';
 import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http'; // Importe withInterceptors
-import { authInterceptor } from './services/auth.interceptor'; // Importe seu arquivo
+import { authInterceptor } from './interceptors/auth.interceptor'; // Importe seu arquivo
 
 export const appConfig: ApplicationConfig = {
   providers: [

@@ -142,25 +142,34 @@ export class ProductFormComponent implements OnInit {
       return;
     }
 
-    const productData = this.form.value;
+    const formValue = this.form.value;
 
+    // --- CORREÇÃO: Payload simplificado para o novo DTO do Java ---
     const payload = {
-      ...productData,
-      active: productData.active ?? true,
-      category: { id: productData.categoryId }
-    };
-    delete payload.categoryId;
+      name: formValue.name,
+      description: formValue.description,
+      brand: formValue.brand,
+      price: formValue.variations[0]?.price || 0, // Pega o preço da 1ª variação como base
+      categoryId: formValue.categoryId, // <--- Manda o ID direto (UUID)
+      videoUrl: '',
+      active: true,
 
-    console.log('Enviando:', payload);
+      // As listas já vêm no formato certo do FormArray
+      images: formValue.images,
+      variations: formValue.variations
+    };
+
+    console.log('Enviando Payload Ajustado:', payload);
 
     this.productService.createProduct(payload).subscribe({
       next: () => {
-        alert('Produto cadastrado com sucesso!');
-        this.router.navigate(['/admin/products']);
+        alert('Produto cadastrado com sucesso! 🚀');
+        this.router.navigate(['/seller-center']);
       },
       error: (err) => {
         console.error(err);
-        alert('Erro ao criar produto.');
+        const msg = err.error ? (typeof err.error === 'string' ? err.error : err.error.message) : 'Erro desconhecido';
+        alert('Erro ao criar produto: ' + msg);
       }
     });
   }

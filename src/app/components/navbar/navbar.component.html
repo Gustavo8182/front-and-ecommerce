@@ -1,0 +1,66 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4 shadow-sm">
+  <div class="container">
+
+    <a class="navbar-brand fw-bold" routerLink="/">
+      <i class="bi bi-shop me-2"></i>Minha Loja
+    </a>
+
+    <div class="d-flex gap-3 align-items-center">
+
+      <a routerLink="/cart" class="btn btn-outline-light position-relative border-0">
+        <i class="bi bi-cart3 fs-5"></i>
+        <span *ngIf="cartCount > 0" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+          {{ cartCount }}
+        </span>
+      </a>
+
+      <a *ngIf="!loggedUser" routerLink="/login" class="btn btn-light text-primary fw-bold">
+        <i class="bi bi-person me-1"></i> Entrar
+      </a>
+
+      <div *ngIf="loggedUser" class="dropdown">
+        <button class="btn btn-outline-light dropdown-toggle d-flex align-items-center gap-2 border-0"
+                type="button" data-bs-toggle="dropdown" aria-expanded="false">
+          <i class="bi bi-person-circle fs-5"></i>
+          <span>Olá, <strong>{{ loggedUser }}</strong></span>
+        </button>
+
+        <ul class="dropdown-menu dropdown-menu-end shadow">
+          <li>
+            <a class="dropdown-item" routerLink="/my-orders">
+              <i class="bi bi-list-ul me-2 text-muted"></i> Meus Pedidos
+            </a>
+          </li>
+
+          <li><hr class="dropdown-divider"></li>
+
+          <li *ngIf="!hasStore">
+            <a class="dropdown-item text-primary fw-bold" routerLink="/seller-center">
+              <i class="bi bi-shop me-2"></i> Quero Vender!
+            </a>
+          </li>
+
+          <li *ngIf="hasStore">
+            <a class="dropdown-item" routerLink="/seller-center">
+              <i class="bi bi-speedometer2 me-2 text-success"></i> Painel do Vendedor
+            </a>
+          </li>
+
+          <li *ngIf="loggedUser === 'admin@email.com'">
+            <a class="dropdown-item text-warning" routerLink="/admin/orders">
+              <i class="bi bi-shield-lock me-2"></i> Painel Admin
+            </a>
+          </li>
+
+          <li><hr class="dropdown-divider"></li>
+          <li>
+            <button class="dropdown-item text-danger" (click)="logout()">
+              <i class="bi bi-box-arrow-right me-2"></i> Sair
+            </button>
+          </li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+</nav>

@@ -21,13 +21,27 @@ export class LoginComponent {
 
   constructor(private authService: AuthService, private router: Router) {}
 
-  onSubmit() {
+onSubmit() {
     this.isLoading = true;
     this.authService.login(this.loginData).subscribe({
-      next: (token) => {
+      next: (data: any) => {
         this.isLoading = false;
-        console.log('Login Sucesso! Token:', token);
-        this.router.navigate(['/']); // Manda o usuário para a Home
+
+        // 1. TRUQUE: Se vier como texto, converte para Objeto
+        let resposta = data;
+        if (typeof data === 'string') {
+            console.log("⚠️ A resposta veio como texto! Convertendo...");
+            resposta = JSON.parse(data);
+        }
+
+        // 2. Agora verificamos na variável 'resposta' (que com certeza é objeto)
+        if (resposta && resposta.token) {
+            localStorage.setItem('auth-token', resposta.token);
+            this.router.navigate(['/']);
+        } else {
+            console.error("❌ ERRO: Token não encontrado no objeto:", resposta);
+            alert("Erro no Login: Token inválido.");
+        }
       },
       error: (err) => {
         this.isLoading = false;

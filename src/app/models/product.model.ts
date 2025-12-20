@@ -1,36 +1,8 @@
-
-
-
-// O Spring retorna um objeto "Page", então precisamos mapear essa resposta
-export interface ProductResponse {
-  content: Product[];
-  totalPages: number;
-  totalElements: number;
-  size: number;
-  number: number; // número da página atual
-}
-
-export interface CartItem {
-  product: Product;
-  variation: ProductVariation; // <--- NOVO CAMPO OBRIGATÓRIO
-  quantity: number;
-}
-
-export interface Address {
-  id?: string;
-  street: string;
-  number: string;
-  complement?: string;
-  neighborhood: string;
-  city: string;
-  state: string;
-  zipCode: string;
-}
-
+// Interfaces auxiliares (Categorias, Imagens, Variações)
 export interface Category {
   id: string;
   name: string;
-  parent?: Category; // O '?' indica opcional
+  parent?: Category;
 }
 
 export interface ProductImage {
@@ -49,6 +21,7 @@ export interface ProductVariation {
   imageUrl?: string;
 }
 
+// Entidade Principal
 export interface Product {
   id: string;
   name: string;
@@ -56,7 +29,7 @@ export interface Product {
   brand: string;
   videoUrl?: string;
 
-  // Objetos aninhados
+  // Relacionamentos
   category: Category;
   images: ProductImage[];
   variations: ProductVariation[];
@@ -71,8 +44,17 @@ export interface Product {
   active: boolean;
   creationDate: string;
 
-  // Links HATEOAS (opcional no front, mas bom ter mapeado)
+  // HATEOAS
   _links?: {
     self: { href: string };
   };
+}
+
+// Resposta Paginada da API
+export interface ProductResponse {
+  content: Product[];
+  totalPages: number;
+  totalElements: number;
+  size: number;
+  number: number;
 }
