@@ -15,6 +15,12 @@ export class ProductService {
 
   // --- LEITURA (Público) ---
 
+  getMyStoreProducts(page: number = 0, size: number = 10): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/stores/my-store/products?page=${page}&size=${size}`);
+    // Obs: Se sua API base for 'http://localhost:8080', ajuste a URL acima para não duplicar.
+    // O ideal é que apiUrl aponte apenas para o domínio base.
+  }
+
   getProducts(page: number = 0, size: number = 10, search: string = ''): Observable<ProductResponse> {
     let params = new HttpParams()
       .set('page', page.toString())
