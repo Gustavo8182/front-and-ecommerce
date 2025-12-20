@@ -2,13 +2,14 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { catchError, map, Observable, of } from 'rxjs';
 import { CreateStoreRequest, Store } from '../models/store.model';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class StoreService {
   // Ajuste a porta se necessário
-  private apiUrl = 'http://localhost:8080/stores';
+   private apiUrl = `${environment.apiBaseUrl}/stores`;
 
   constructor(private http: HttpClient) { }
 
