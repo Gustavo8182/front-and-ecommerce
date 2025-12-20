@@ -4,6 +4,7 @@ import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { jwtDecode } from 'jwt-decode';
 import { map } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
+import { RegisterRequest } from '../models/auth.model';
 
 @Injectable({
   providedIn: 'root'
@@ -62,7 +63,7 @@ export class AuthService {
     this.username.next(""); // Limpa o nome
   }
 
-  register(userData: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}/register`, userData);
+  register(userData: RegisterRequest): Observable<void> {
+    return this.http.post<void>(`${this.apiUrl}/register`, userData);
   }
 }

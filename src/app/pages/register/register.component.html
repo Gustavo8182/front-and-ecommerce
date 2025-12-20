@@ -1,15 +1,44 @@
 <div class="container d-flex justify-content-center align-items-center vh-100">
-  <div class="card p-4 shadow-lg" style="width: 400px;">
-    <div class="text-center mb-4">
+  <div class="card p-4 shadow-lg" style="width: 500px;"> <div class="text-center mb-4">
       <i class="bi bi-person-plus-fill display-1 text-success"></i>
       <h3 class="mt-3">Crie sua Conta</h3>
     </div>
 
     <form (ngSubmit)="onSubmit()">
+
       <div class="mb-3">
-        <label for="email" class="form-label">Email</label>
+        <label for="fullName" class="form-label">Nome Completo</label>
+        <input type="text" class="form-control" id="fullName"
+               [(ngModel)]="registerData.fullName" name="fullName"
+               placeholder="Ex: Gustavo Silva" required>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label for="cpf" class="form-label">CPF</label>
+          <input type="text" class="form-control" id="cpf"
+                 [(ngModel)]="registerData.cpf" name="cpf"
+                 placeholder="000.000.000-00" required>
+        </div>
+        <div class="col-md-6 mb-3">
+          <label for="birthDate" class="form-label">Data de Nascimento</label>
+          <input type="date" class="form-control" id="birthDate"
+                 [(ngModel)]="registerData.birthDate" name="birthDate" required>
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label for="phone" class="form-label">Celular / WhatsApp</label>
+        <input type="text" class="form-control" id="phone"
+               [(ngModel)]="registerData.phone" name="phone"
+               placeholder="(00) 00000-0000" required>
+      </div>
+
+      <hr class="my-4"> <div class="mb-3">
+        <label for="email" class="form-label">E-mail</label>
         <input type="email" class="form-control" id="email"
-               [(ngModel)]="registerData.login" name="login" required>
+               [(ngModel)]="registerData.login" name="login"
+               placeholder="seu@email.com" required>
       </div>
 
       <div class="mb-3">

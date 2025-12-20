@@ -6,8 +6,8 @@ import { CartService } from '../../services/cart.service';
 import { AuthService } from '../../services/auth.service';
 import { OrderService } from '../../services/order.service';
 import { AddressService } from '../../services/address.service';
-import { CartItem } from '../../models/product.model';
-import { Address } from '../../models/product.model';
+import { CartItem } from '../../models/cart.model';
+import { Address } from '../../models/address.model';
 
 @Component({
   selector: 'app-cart',
