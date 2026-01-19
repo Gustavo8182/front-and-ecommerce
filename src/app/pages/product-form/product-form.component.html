@@ -1,170 +1,182 @@
-<div class="container mt-4 mb-5">
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2>{{ isEditMode ? 'Editar' : 'Novo' }} Produto</h2>
-    <a routerLink="/admin/products" class="btn btn-outline-secondary">Cancelar</a>
-  </div>
+<div class="container-fluid bg-light min-vh-100 p-4">
 
-  <form [formGroup]="form" (ngSubmit)="onSubmit()">
 
-    <div class="card shadow-sm mb-4">
-      <div class="card-header bg-white fw-bold">Dados Básicos</div>
-      <div class="card-body">
+  <form [formGroup]="form">
+
+    <div class="card border-0 shadow-sm mb-4">
+      <div class="card-header bg-white py-3">
+        <h5 class="mb-0 fw-bold">Informação Básica</h5>
+      </div>
+      <div class="card-body p-4">
+
+        <div class="mb-4">
+          <label class="form-label fw-bold">Imagens do Produto *</label>
+          <div class="d-flex gap-3 flex-wrap" formArrayName="images">
+             <div *ngFor="let img of imagesArray.controls; let i=index" [formGroupName]="i" class="position-relative" style="width: 100px;">
+                <div class="border rounded d-flex align-items-center justify-content-center bg-light" style="height: 100px; overflow: hidden;">
+                    <img *ngIf="img.get('imageUrl')?.value" [src]="img.get('imageUrl')?.value" class="img-fluid">
+                    <span *ngIf="!img.get('imageUrl')?.value" class="text-muted small text-center px-1">Cole URL</span>
+                </div>
+                <input type="text" class="form-control form-control-sm mt-1" formControlName="imageUrl" placeholder="URL">
+                <button type="button" class="btn btn-sm btn-danger position-absolute top-0 end-0 rounded-circle"
+                        style="transform: translate(30%, -30%); padding: 0px 6px;" (click)="removeImage(i)">x</button>
+             </div>
+
+             <div class="border rounded d-flex flex-column align-items-center justify-content-center text-primary cursor-pointer hover-bg-light"
+                  style="width: 100px; height: 100px; border-style: dashed !important; cursor: pointer;"
+                  (click)="addImage()">
+                <i class="bi bi-plus-lg fs-4"></i>
+                <small>Adicionar</small>
+             </div>
+          </div>
+        </div>
+
         <div class="row g-3">
-
-          <div class="col-md-8">
-            <label class="form-label">Nome do Produto *</label>
-            <input type="text" class="form-control" formControlName="name" placeholder="Ex: Notebook Gamer">
-          </div>
-
-<div class="col-md-4">
-            <label class="form-label">Categoria *</label>
-
-            <select *ngIf="!isCreatingCategory"
-                    class="form-select"
-                    formControlName="categoryId"
-                    (change)="onCategoryChange($event)"> <option [ngValue]="null" disabled>Selecione...</option>
-
-              <option *ngFor="let cat of categories" [value]="cat.id">
-                {{ cat.name }}
-              </option>
-
-              <option value="NEW" class="fw-bold text-primary">
-                + Cadastrar Nova Categoria...
-              </option>
-            </select>
-
-            <div *ngIf="isCreatingCategory" class="input-group">
-              <input type="text" class="form-control"
-                     placeholder="Nome da nova categoria"
-                     [(ngModel)]="newCategoryName"
-                     [ngModelOptions]="{standalone: true}"
-                     autofocus> <button class="btn btn-success" type="button"
-                      (click)="saveNewCategory()"
-                      [disabled]="isSavingCategory || !newCategoryName">
-                <i class="bi bi-check-lg"></i>
-              </button>
-
-              <button class="btn btn-outline-secondary" type="button"
-                      (click)="cancelNewCategory()">
-                <i class="bi bi-x-lg"></i>
-              </button>
+            <div class="col-12">
+                <label class="form-label fw-bold">Nome do Produto *</label>
+                <input type="text" class="form-control" formControlName="name" placeholder="Ex: Chave de Teste Digital">
+                <div class="text-end text-muted small mt-1">{{ form.get('name')?.value?.length || 0 }}/120</div>
             </div>
-          </div>
 
-          <div class="col-md-6">
-            <label class="form-label">Marca</label>
-            <input type="text" class="form-control" formControlName="brand">
-          </div>
+            <div class="col-md-6">
+                <label class="form-label fw-bold">Categoria *</label>
+                <select class="form-select" formControlName="categoryId">
+                    <option [ngValue]="null" disabled>Selecione uma categoria...</option>
+                    <option *ngFor="let cat of categories" [value]="cat.id">{{ cat.name }}</option>
+                </select>
+            </div>
 
-          <div class="col-12">
-            <label class="form-label">Descrição Completa</label>
-            <textarea class="form-control" rows="3" formControlName="description"></textarea>
-          </div>
+            <div class="col-md-6">
+                <label class="form-label fw-bold">Marca</label>
+                <input type="text" class="form-control" formControlName="brand" placeholder="Ex: Sparta">
+            </div>
         </div>
-      </div>
-    </div>
 
-    <div class="card shadow-sm mb-4">
-      <div class="card-header bg-white fw-bold d-flex justify-content-between align-items-center">
-        <span>Imagens do Produto</span>
-        <button type="button" class="btn btn-sm btn-outline-primary" (click)="addImage()">
-          <i class="bi bi-plus-lg"></i> Adicionar URL
-        </button>
-      </div>
-      <div class="card-body">
-
-        <div formArrayName="images">
-          <div *ngFor="let imgCtrl of imagesArray.controls; let i = index" [formGroupName]="i" class="row g-2 mb-2 align-items-center">
-
-            <div class="col-md-1 text-center">
-              <div class="form-check form-switch d-flex justify-content-center">
-                <input class="form-check-input" type="radio" name="mainImage"
-                       [checked]="imgCtrl.get('main')?.value"
-                       (change)="setMainImage(i)"
-                       title="Definir como capa">
-              </div>
-            </div>
-
-            <div class="col-md-9">
-              <input type="text" class="form-control" formControlName="imageUrl" placeholder="http://link-da-imagem.jpg">
-            </div>
-
-            <div class="col-md-2 text-end">
-              <button type="button" class="btn btn-outline-danger" (click)="removeImage(i)" [disabled]="imagesArray.length === 1">
-                <i class="bi bi-trash"></i>
-              </button>
-            </div>
-
-            <div class="col-12 text-center" *ngIf="imgCtrl.get('imageUrl')?.value">
-               <img [src]="imgCtrl.get('imageUrl')?.value" style="height: 60px; object-fit: contain;" class="mt-1 border rounded p-1">
-            </div>
-
-          </div>
+        <div class="mt-4">
+            <label class="form-label fw-bold">Descrição do Produto *</label>
+            <textarea class="form-control" rows="6" formControlName="description"></textarea>
         </div>
 
       </div>
     </div>
 
-    <div class="card shadow-sm mb-4 border-primary">
-      <div class="card-header bg-primary text-white fw-bold d-flex justify-content-between align-items-center">
-        <span>Variações (Preço e Estoque)</span>
-        <button type="button" class="btn btn-sm btn-light text-primary" (click)="addVariation()">
-          <i class="bi bi-plus-lg"></i> Nova Variação
-        </button>
-      </div>
-      <div class="card-body p-0">
-
-        <div class="table-responsive">
-          <table class="table table-hover mb-0 align-middle">
-            <thead class="bg-light">
-              <tr>
-                <th style="width: 30%">Nome (Cor/Tamanho) *</th>
-                <th style="width: 20%">Preço (R$) *</th>
-                <th style="width: 15%">Estoque *</th>
-                <th style="width: 20%">SKU/Cód</th>
-                <th style="width: 5%"></th>
-              </tr>
-            </thead>
-            <tbody formArrayName="variations">
-              <tr *ngFor="let varCtrl of variationsArray.controls; let i = index" [formGroupName]="i">
-
-                <td>
-                  <input type="text" class="form-control" formControlName="name" placeholder="Ex: Azul - M">
-                </td>
-
-                <td>
-                  <div class="input-group">
-                    <span class="input-group-text">R$</span>
-                    <input type="number" class="form-control" formControlName="price">
-                  </div>
-                </td>
-
-                <td>
-                  <input type="number" class="form-control" formControlName="quantityStock">
-                </td>
-
-                <td>
-                  <input type="text" class="form-control" formControlName="sku" placeholder="COD-01">
-                </td>
-
-                <td class="text-end">
-                  <button type="button" class="btn btn-sm btn-outline-danger" (click)="removeVariation(i)" [disabled]="variationsArray.length === 1">
-                    <i class="bi bi-trash"></i>
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-white py-3">
+          <h5 class="mb-0 fw-bold">Informações de Vendas</h5>
         </div>
+        <div class="card-body p-4">
+            <label class="form-label fw-bold mb-3">Variações (Preço e Estoque)</label>
+            <table class="table table-bordered align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Nome (Cor/Tamanho)</th>
+                        <th>Preço (R$)</th>
+                        <th>Estoque</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody formArrayName="variations">
+                    <tr *ngFor="let v of variationsArray.controls; let i=index" [formGroupName]="i">
+                        <td><input type="text" class="form-control" formControlName="name" placeholder="Ex: Azul"></td>
+                        <td><div class="input-group"><span class="input-group-text">R$</span><input type="number" class="form-control" formControlName="price"></div></td>
+                        <td><input type="number" class="form-control" formControlName="quantityStock"></td>
+                        <td class="text-center"><button class="btn btn-outline-danger btn-sm" (click)="removeVariation(i)"><i class="bi bi-trash"></i></button></td>
+                    </tr>
+                </tbody>
+            </table>
+            <button type="button" class="btn btn-outline-primary btn-sm border-dashed" (click)="addVariation()">
+                + Adicionar Variação
+            </button>
+        </div>
+    </div>
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-white py-3">
+          <h5 class="mb-0 fw-bold text-danger">Informações Fiscais</h5>
+        </div>
+        <div class="card-body p-4">
+            <div class="alert alert-light border mb-4 small text-muted">
+                <i class="bi bi-info-circle me-1"></i>
+                Para fins de teste, estes campos são opcionais. No futuro, serão obrigatórios para emissão de NF-e.
+            </div>
 
-      </div>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label">NCM <i class="bi bi-question-circle text-muted" title="Nomenclatura Comum do Mercosul"></i></label>
+                    <input type="text" class="form-control" formControlName="ncm" placeholder="Ex: 82054000">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Origem</label>
+                    <select class="form-select" formControlName="origin">
+                        <option value="0">0 - Nacional</option>
+                        <option value="1">1 - Estrangeira (Imp. Direta)</option>
+                        <option value="2">2 - Estrangeira (Adq. no mercado interno)</option>
+                    </select>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">CFOP (Mesmo Estado)</label>
+                    <input type="text" class="form-control" formControlName="cfopState" placeholder="Ex: 5101">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">CFOP (Outros Estados)</label>
+                    <input type="text" class="form-control" formControlName="cfopInterstate" placeholder="Ex: 6101">
+                </div>
+
+                <div class="col-md-8">
+                    <label class="form-label">CSOSN (Simples Nacional)</label>
+                    <select class="form-select" formControlName="csosn">
+                        <option value="101">101 - Tributada com permissão de crédito</option>
+                        <option value="102">102 - Tributada sem permissão de crédito</option>
+                        <option value="500">500 - ICMS cobrado anteriormente (ST)</option>
+                        <option value="900">900 - Outros</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Unidade de Medida</label>
+                    <input type="text" class="form-control" formControlName="unit" placeholder="UN, KG, CX">
+                </div>
+
+                <div class="col-12">
+                    <label class="form-label">CEST (Substituição Tributária)</label>
+                    <input type="text" class="form-control" formControlName="cest" placeholder="Ex: 13.005.00">
+                </div>
+            </div>
+        </div>
     </div>
 
-    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-      <button type="submit" class="btn btn-success btn-lg px-5" [disabled]="form.invalid">
-        <i class="bi bi-check-lg"></i> Salvar Produto Completo
-      </button>
+    <div class="card border-0 shadow-sm mb-4">
+       </div>
+
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-white py-3">
+          <h5 class="mb-0 fw-bold">Envio</h5>
+        </div>
+        <div class="card-body p-4">
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label">Peso (kg)</label>
+                    <input type="number" class="form-control" placeholder="0.5">
+                </div>
+                <div class="col-md-9">
+                    <label class="form-label">Dimensões do Pacote (cm)</label>
+                    <div class="d-flex gap-2 align-items-center">
+                        <input type="number" class="form-control" placeholder="Largura">
+                        <span>x</span>
+                        <input type="number" class="form-control" placeholder="Comprimento">
+                        <span>x</span>
+                        <input type="number" class="form-control" placeholder="Altura">
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
   </form>
+  <div class="d-flex justify-content-between align-items-center mb-4 bg-white p-3 shadow-sm rounded">
+    <h4 class="mb-0 fw-bold">{{ isEditMode ? 'Editar Produto' : 'Novo Produto' }}</h4>
+    <div>
+        <button type="button" class="btn btn-outline-secondary me-2" routerLink="/seller-center">Cancelar</button>
+        <button type="button" class="btn btn-danger" (click)="onSubmit()" [disabled]="form.invalid">Salvar e Publicar</button>
+    </div>
+  </div>
 </div>

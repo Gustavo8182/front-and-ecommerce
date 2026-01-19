@@ -1,0 +1,48 @@
+# 🅰️ Backlog Front-end (Angular)
+
+## 🚀 0. Prioridade Imediata (Próximo Sprint)
+- [ ] **🔍 Busca e Filtros (Search)**
+  - [ ] Implementar barra de pesquisa funcional na Navbar.
+  - [ ] Criar página de `SearchResultsComponent`.
+  - [ ] Adicionar filtros laterais (Categorias, Faixa de Preço).
+- [ ] **🛒 UX do Carrinho**
+  - [ ] **Limpeza Automática:** Limpar `localStorage` e estado do carrinho após sucesso (201 Created) do pedido.
+- [ ] **🛡️ Segurança Técnica**
+  - [ ] Blindar `AuthInterceptor`: Não enviar Token JWT para APIs externas (ViaCEP, Correios).
+
+---
+
+## 🚨 1. Integração & Core (Fixes)
+- [x] **Atualizar Modelos (Interfaces)**
+  - [x] Ajustar `Store.ts`: Remover `creationDate`, adicionar `ownerName`.
+  - [x] Ajustar `Product.ts`: Adicionar campos fiscais e objetos resumidos (`store`, `category`).
+  - [x] Criar `Order.ts` e `Page.ts` (Genérico).
+- [x] **Tratamento de Erros Visual**
+  - [x] Atualizar `AuthInterceptor` e criar `ErrorInterceptor`.
+  - [x] Exibir alertas (`alert` provisório) com mensagem do Backend.
+
+## 🛒 2. Experiência de Compra
+- [ ] **Detalhes do Produto (Variações)**
+  - [ ] Componente visual para selecionar Variação (Botões: "Azul", "Vermelho") em vez de dropdown nativo.
+  - [ ] Bloquear botão "Comprar" se a variação estiver sem estoque.
+  - [ ] Exibir fotos da variação selecionada (trocar a foto principal ao clicar na cor).
+- [ ] **Checkout e Pagamento**
+  - [ ] Tela de escolha de Endereço (Listar endereços da API + Botão "Novo Endereço").
+  - [ ] Exibir resumo do pedido com Frete calculado.
+  - [ ] Tela de "Aguardando Pagamento" exibindo QR Code do PIX.
+
+## 🏪 3. Portal do Vendedor
+- [ ] **Dashboard da Loja**
+  - [ ] Gráfico simples de vendas diárias.
+  - [x] Lista de pedidos recebidos (`seller-orders`).
+  - [ ] Botões de ação na lista ("Confirmar Envio", "Cancelar").
+- [ ] **Cadastro de Produto Otimizado**
+  - [ ] Melhorar UI de cadastro de Variações (tabela para editar preços/estoque de várias cores de uma vez).
+  - [ ] Componente de Upload de imagem (Preview antes de enviar).
+
+## 👤 4. Área do Usuário
+- [x] **Meus Pedidos**
+  - [x] Listagem dos pedidos do cliente (`my-orders`).
+  - [ ] Abas de status: "A Pagar", "Enviados", "Concluídos".
+  - [ ] Botão "Confirmar Recebimento" (Libera o dinheiro para o vendedor).
+  - [ ] Botão "Avaliar Produto" (Abre modal com estrelas e texto).

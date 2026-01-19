@@ -10,18 +10,38 @@ import { AdminOrdersComponent } from './pages/admin-orders/admin-orders.componen
 import { AdminProductsComponent } from './pages/admin-products/admin-products.component';
 import { ProductFormComponent } from './pages/product-form/product-form.component';
 import { SellerCenterComponent } from './pages/seller-center/seller-center.component';
+import { FinanceComponent } from './pages/finance/finance.component';
+import { MarketingComponent } from './pages/marketing/marketing.component';
+import { SellerOrdersComponent } from './pages/seller-orders/seller-orders.component';
+import { authGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
     { path: '', component: ProductListComponent },
     { path: 'login', component: LoginComponent },
     { path: 'register', component: RegisterComponent },
-    { path: 'my-orders', component: MyOrdersComponent },
+
+    // Área do Comprador
+    { path: 'my-orders', component: MyOrdersComponent, canActivate: [authGuard] }, // Protegido também
     { path: 'search', component: SearchResultsComponent },
     { path: 'product/:id', component: ProductDetailsComponent },
     { path: 'cart', component: CartComponent },
-    { path: 'admin/orders', component: AdminOrdersComponent },
-    { path: 'admin/products', component: AdminProductsComponent },
-    { path: 'admin/products/new', component: ProductFormComponent },
-    { path: 'admin/products/:id', component: ProductFormComponent },
-    { path: 'seller-center', component: SellerCenterComponent }
+
+    // Área Admin
+    { path: 'admin/orders', component: AdminOrdersComponent, canActivate: [authGuard] },
+    { path: 'admin/products', component: AdminProductsComponent, canActivate: [authGuard] },
+    { path: 'admin/products/new', component: ProductFormComponent, canActivate: [authGuard] },
+    { path: 'admin/products/:id', component: ProductFormComponent, canActivate: [authGuard] },
+
+    // Área do Vendedor (Seller Center)
+    { path: 'seller-center', component: SellerCenterComponent, canActivate: [authGuard] },
+
+    // CORREÇÃO AQUI: Removemos a duplicata e deixamos apenas o componente correto
+    { path: 'seller/orders', component: SellerOrdersComponent, canActivate: [authGuard] },
+
+    { path: 'seller/finance', component: FinanceComponent, canActivate: [authGuard] },
+    { path: 'seller/marketing', component: MarketingComponent, canActivate: [authGuard] },
+
+    // Formulário de Produto (Edição/Criação)
+    { path: 'product-form', component: ProductFormComponent, canActivate: [authGuard] },
+    { path: 'product-form/:id', component: ProductFormComponent, canActivate: [authGuard] },
 ];
