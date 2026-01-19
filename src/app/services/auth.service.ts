@@ -12,42 +12,41 @@ import { RegisterRequest } from '../models/auth.model';
 export class AuthService {
   private apiUrl = `${environment.apiBaseUrl}/auth`;
 
-  // Agora guardamos o NOME do usuário, não só booleano
+  // Guarda o NOME/EMAIL do usuário
   private username = new BehaviorSubject<string>("");
 
   constructor(private http: HttpClient) {
-    // Ao iniciar (F5), verifica se já tem token salvo e recupera o nome
     this.decodeToken();
   }
 
-  // Método privado para ler o token
   private decodeToken() {
     const token = localStorage.getItem('auth-token');
     if (token) {
       try {
         const decoded: any = jwtDecode(token);
-        // O backend salvou o email no campo "sub" (subject)
         this.username.next(decoded.sub || "");
       } catch (error) {
         console.error("Erro ao decodificar token", error);
-        this.logout(); // Se o token estiver corrompido, desloga
+        this.logout();
       }
     } else {
       this.username.next("");
     }
   }
 
-  // Quem quiser saber o nome do usuário, se inscreve aqui
   getUsername(): Observable<string> {
     return this.username.asObservable();
   }
 
+  // --- CORREÇÃO PRINCIPAL AQUI ---
   login(credentials: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}/login`, credentials, { responseType: 'text' })
+    return this.http.post(`${this.apiUrl}/login`, credentials)
       .pipe(
-        tap((token) => {
-          localStorage.setItem('auth-token', token);
-          this.decodeToken(); // <--- Decodifica assim que loga
+        tap((response: any) => {
+          if (response && response.token) {
+            localStorage.setItem('auth-token', response.token);
+            this.decodeToken(); // Atualiza o estado do usuário
+          }
         })
       );
   }
@@ -60,7 +59,7 @@ export class AuthService {
 
   logout() {
     localStorage.removeItem('auth-token');
-    this.username.next(""); // Limpa o nome
+    this.username.next("");
   }
 
   register(userData: RegisterRequest): Observable<void> {

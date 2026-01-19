@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { ProductService } from '../../services/product.service';
 import { CartService } from '../../services/cart.service';
-import { Product, ProductVariation } from '../../models/product.model'; // Importe ProductVariation
+import { Product, ProductVariation } from '../../models/product.model';
 
 @Component({
   selector: 'app-product-details',
@@ -15,8 +15,8 @@ import { Product, ProductVariation } from '../../models/product.model'; // Impor
 export class ProductDetailsComponent implements OnInit {
 
   product: Product | null = null;
-  selectedVariation: ProductVariation | null = null; // Guarda a escolha do usuário
-  currentImage: string = ''; // Guarda a imagem que está aparecendo na tela grande
+  selectedVariation: ProductVariation | null = null;
+  currentImage: string = '';
   isLoading: boolean = true;
 
   constructor(
@@ -33,17 +33,15 @@ export class ProductDetailsComponent implements OnInit {
         next: (data) => {
           this.product = data;
           this.isLoading = false;
-
-          // LOGICA DE AUTO-SELEÇÃO:
-          // Se tiver imagens, define a principal como capa inicial
-          if (this.product.images && this.product.images.length > 0) {
-            const mainImg = this.product.images.find(i => i.main);
-            this.currentImage = mainImg ? mainImg.imageUrl : this.product.images[0].imageUrl;
+          
+          if (data.images && data.images.length > 0) {
+            const mainImg = data.images.find((i: any) => i.main);
+            // Se achar a main, usa ela. Se não, usa a primeira da lista.
+            this.currentImage = mainImg ? mainImg.imageUrl : data.images[0].imageUrl;
           }
 
-          // Se tiver variações, seleciona a primeira automaticamente
-          if (this.product.variations && this.product.variations.length > 0) {
-            this.selectVariation(this.product.variations[0]);
+          if (data.variations && data.variations.length > 0) {
+            this.selectVariation(data.variations[0]);
           }
         },
         error: (err) => {
@@ -54,24 +52,20 @@ export class ProductDetailsComponent implements OnInit {
     }
   }
 
-  // Método chamado quando o usuário clica num botão de variação
   selectVariation(variation: ProductVariation) {
     this.selectedVariation = variation;
 
-    // Se a variação tem foto específica (ex: celular azul), troca a imagem principal
     if (variation.imageUrl) {
       this.currentImage = variation.imageUrl;
     }
   }
 
-  // Método para trocar imagem ao clicar nas miniaturas (Thumbnails)
   changeImage(url: string) {
     this.currentImage = url;
   }
 
   addToCart() {
     if (this.product && this.selectedVariation) {
-      // CORREÇÃO DO ERRO: Passamos o Produto E a Variação
       this.cartService.addToCart(this.product, this.selectedVariation);
       alert(`Produto "${this.product.name}" (${this.selectedVariation.name}) adicionado!`);
     } else {

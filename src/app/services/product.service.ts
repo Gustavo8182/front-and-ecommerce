@@ -1,7 +1,7 @@
 import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { Product, ProductResponse } from '../models/product.model';
+import { Product } from '../models/product.model';
 import { environment } from '../../environments/environment';
 
 @Injectable({
@@ -13,15 +13,12 @@ export class ProductService {
 
   constructor(private http: HttpClient) { }
 
-  // --- LEITURA (Público) ---
 
-  getMyStoreProducts(page: number = 0, size: number = 10): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/stores/my-store/products?page=${page}&size=${size}`);
-    // Obs: Se sua API base for 'http://localhost:8080', ajuste a URL acima para não duplicar.
-    // O ideal é que apiUrl aponte apenas para o domínio base.
+  createProduct(product: any): Observable<any> {
+    return this.http.post(this.apiUrl, product);
   }
 
-  getProducts(page: number = 0, size: number = 10, search: string = ''): Observable<ProductResponse> {
+getProducts(page: number = 0, size: number = 10, search: string = ''): Observable<any> {
     let params = new HttpParams()
       .set('page', page.toString())
       .set('size', size.toString())
@@ -31,39 +28,18 @@ export class ProductService {
       params = params.set('search', search);
     }
 
-    return this.http.get<ProductResponse>(this.apiUrl, { params });
+    return this.http.get<any>(this.apiUrl, { params });
   }
 
-  getProductById(id: string): Observable<Product> {
-    return this.http.get<Product>(`${this.apiUrl}/${id}`);
-  }
-
-  // --- ESCRITA (Admin - Requer Token) ---
-
- createProduct(product: any): Observable<any> {
-    const token = localStorage.getItem('auth-token');
-    const headers = new HttpHeaders({
-      'Authorization': `Bearer ${token}`
-    });
-
-    return this.http.post(this.apiUrl, product, { headers });
+  getProductById(id: string): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/${id}`);
   }
 
   updateProduct(id: string, product: any): Observable<any> {
-    const token = localStorage.getItem('auth-token');
-    const headers = new HttpHeaders({
-      'Authorization': `Bearer ${token}`
-    });
-
-    return this.http.put(`${this.apiUrl}/${id}`, product, { headers });
+    return this.http.put(`${this.apiUrl}/${id}`, product);
   }
 
   deleteProduct(id: string): Observable<any> {
-    const token = localStorage.getItem('auth-token');
-    const headers = new HttpHeaders({
-      'Authorization': `Bearer ${token}`
-    });
-
-    return this.http.delete(`${this.apiUrl}/${id}`, { headers });
+    return this.http.delete(`${this.apiUrl}/${id}`);
   }
 }

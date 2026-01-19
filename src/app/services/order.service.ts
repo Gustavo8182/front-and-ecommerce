@@ -3,6 +3,8 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { CartItem } from '../models/cart.model';
 import { environment } from '../../environments/environment';
+import { Page } from '../models/page.model';
+import { Order } from '../models/order.model';
 
 
 @Injectable({
@@ -27,6 +29,11 @@ export class OrderService {
     });
 
     return this.http.post(`${this.baseUrl}/orders`, orderData, { headers });
+  }
+
+
+  getStoreOrders(page: number = 0, size: number = 10): Observable<Page<Order>> {
+  return this.http.get<Page<Order>>(`${this.baseUrl}/stores/my-store/orders?page=${page}&size=${size}`);
   }
 
   getMyOrders(): Observable<any[]> {

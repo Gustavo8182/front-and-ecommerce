@@ -7,6 +7,7 @@ import { Router, RouterModule } from '@angular/router';
 import { ProductService } from '../../services/product.service';
 
 
+
 @Component({
   selector: 'app-seller-center',
   standalone: true,
@@ -36,6 +37,10 @@ export class SellerCenterComponent implements OnInit {
     });
   }
 
+  navigateTo(route: string) {
+    this.router.navigate([route]);
+  }
+
   ngOnInit(): void {
     this.checkHasStore();
 
@@ -63,7 +68,7 @@ export class SellerCenterComponent implements OnInit {
 
   loadMyProducts() {
     // Certifique-se que o ProductService tem o método getMyStoreProducts()
-    this.productService.getMyStoreProducts().subscribe({
+    this.storeService.getMyStoreProducts().subscribe({
       next: (pageData) => {
         this.myProducts = pageData.content;
         this.totalProducts = pageData.totalElements;
