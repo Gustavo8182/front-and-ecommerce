@@ -41,4 +41,8 @@ export class StoreService {
   getMyStoreProducts(page: number = 0, size: number = 10): Observable<any> {
   return this.http.get<any>(`${this.apiUrl}/stores/my-store/products?page=${page}&size=${size}`, { headers: this.getHeaders() });
   }
+
+  getById(id: string): Observable<Store> {
+    return this.http.get<Store>(`${this.apiUrl}/stores/${id}`);
+  }
 }

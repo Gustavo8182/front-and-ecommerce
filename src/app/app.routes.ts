@@ -14,6 +14,7 @@ import { FinanceComponent } from './pages/finance/finance.component';
 import { MarketingComponent } from './pages/marketing/marketing.component';
 import { SellerOrdersComponent } from './pages/seller-orders/seller-orders.component';
 import { authGuard } from './guards/auth.guard';
+import { StoreProfileComponent } from './pages/store-profile/store-profile.component';
 
 export const routes: Routes = [
     { path: '', component: ProductListComponent },
@@ -24,6 +25,7 @@ export const routes: Routes = [
     { path: 'my-orders', component: MyOrdersComponent, canActivate: [authGuard] }, // Protegido também
     { path: 'search', component: SearchResultsComponent },
     { path: 'product/:id', component: ProductDetailsComponent },
+    { path: 'shop/:id', component: StoreProfileComponent },
     { path: 'cart', component: CartComponent },
 
     // Área Admin

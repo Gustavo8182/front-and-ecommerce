@@ -17,7 +17,7 @@ export class ProductDetailsComponent implements OnInit {
   product: Product | null = null;
   selectedVariation: ProductVariation | null = null;
   currentImage: string = '';
-  isLoading: boolean = true;
+  isLoading = true;
 
   constructor(
     private route: ActivatedRoute,
@@ -27,24 +27,23 @@ export class ProductDetailsComponent implements OnInit {
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
-
     if (id) {
-      this.productService.getProductById(id).subscribe({
-        next: (data) => {
+      this.productService.getById(id).subscribe({
+        // CORREÇÃO 1: Tipagem explícita (data: Product)
+        next: (data: Product) => {
           this.product = data;
-          this.isLoading = false;
-          
-          if (data.images && data.images.length > 0) {
-            const mainImg = data.images.find((i: any) => i.main);
-            // Se achar a main, usa ela. Se não, usa a primeira da lista.
-            this.currentImage = mainImg ? mainImg.imageUrl : data.images[0].imageUrl;
+
+          // CORREÇÃO 2: Verificação de segurança (?.)
+          if (this.product?.variations && this.product.variations.length > 0) {
+            this.selectVariation(this.product.variations[0]);
+          } else {
+            this.currentImage = this.getMainImage(data);
           }
 
-          if (data.variations && data.variations.length > 0) {
-            this.selectVariation(data.variations[0]);
-          }
+          this.isLoading = false;
         },
-        error: (err) => {
+        // CORREÇÃO 3: Tipagem do erro (err: any)
+        error: (err: any) => {
           console.error(err);
           this.isLoading = false;
         }
@@ -57,19 +56,30 @@ export class ProductDetailsComponent implements OnInit {
 
     if (variation.imageUrl) {
       this.currentImage = variation.imageUrl;
+    } else {
+      // CORREÇÃO 4: Garante que product existe antes de chamar
+      if (this.product) {
+        this.currentImage = this.getMainImage(this.product);
+      }
     }
-  }
-
-  changeImage(url: string) {
-    this.currentImage = url;
   }
 
   addToCart() {
     if (this.product && this.selectedVariation) {
       this.cartService.addToCart(this.product, this.selectedVariation);
-      alert(`Produto "${this.product.name}" (${this.selectedVariation.name}) adicionado!`);
+      alert('Produto adicionado ao carrinho!');
     } else {
-      alert('Por favor, selecione uma opção.');
+      alert('Por favor, selecione uma variação.');
     }
+  }
+
+  private getMainImage(product: Product): string {
+    // CORREÇÃO 5: Verifica se imagens existem e têm tamanho > 0
+    if (product.images && product.images.length > 0) {
+      const main = product.images.find(i => i.main);
+      // Se achou principal usa, senão usa a primeira, senão placeholder
+      return main ? main.imageUrl : (product.images[0]?.imageUrl || 'assets/placeholder.png');
+    }
+    return 'assets/placeholder.png';
   }
 }

@@ -21,6 +21,7 @@ export class CartComponent implements OnInit {
   cartItems: CartItem[] = [];
   total: number = 0;
   isLogged: boolean = false;
+  isLoading = false;
 
   // --- Variáveis de Endereço ---
   addresses: Address[] = [];
@@ -125,10 +126,9 @@ export class CartComponent implements OnInit {
     return 'assets/img/sem-foto.jpg';
   }
 
-  // --- CHECKOUT (CORRIGIDO) ---
-  checkout() {
+ checkout() {
     if (!this.isLogged) {
-      alert('Por favor, faça login.');
+      alert('Por favor, faça login para continuar.');
       this.router.navigate(['/login']);
       return;
     }
@@ -136,32 +136,37 @@ export class CartComponent implements OnInit {
     if (this.cartItems.length === 0) return;
 
     if (!this.selectedAddressId) {
-      alert('Por favor, selecione ou cadastre um endereço de entrega.');
+      alert('Por favor, selecione um endereço de entrega.');
       return;
     }
 
-    // 1. Monta o Objeto DTO exatamente como o Java espera
+    this.isLoading = true; // Bloqueia o botão
+
     const orderData = {
       addressId: this.selectedAddressId,
       items: this.cartItems.map(item => ({
-        variationId: item.variation.id, // <--- O PULO DO GATO: Envia o ID da Variação
+        variationId: item.variation.id,
         quantity: item.quantity
       }))
     };
 
-    console.log('Enviando Pedido:', orderData);
-
-    // 2. Envia para o serviço
     this.orderService.createOrder(orderData).subscribe({
       next: (order) => {
-        alert('Pedido realizado com sucesso!');
+        alert('Pedido realizado com sucesso! 🎉');
+
+        // --- LIMPEZA DE CARRINHO ---
         this.cartService.clearCart();
-        // Redireciona para "Meus Pedidos" ou Home
-        this.router.navigate(['/orders']);
+        // --------------------------
+
+        this.isLoading = false;
+
+        // CORREÇÃO: O caminho correto para a tela do comprador é /my-orders
+        this.router.navigate(['/my-orders']);
       },
       error: (err) => {
-        console.error(err);
-        alert('Erro ao processar pedido. Verifique o console.');
+        console.error('Erro ao criar pedido:', err);
+        alert('Erro ao processar pedido. Tente novamente.');
+        this.isLoading = false;
       }
     });
   }

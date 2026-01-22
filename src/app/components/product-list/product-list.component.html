@@ -1,25 +1,5 @@
 <div class="container mt-5 mb-5">
 
-  <div class="row mb-5 align-items-center">
-    <div class="col-md-6">
-      <h2 class="fw-bold text-dark mb-0">Nossos Produtos</h2>
-      <p class="text-muted">As melhores ofertas para você</p>
-    </div>
-    <div class="col-md-6">
-      <div class="input-group shadow-sm">
-        <input type="text"
-               class="form-control border-0 bg-light"
-               placeholder="O que você procura hoje?"
-               [(ngModel)]="searchTerm"
-               (keyup)="handleKeyUp($event)"
-               style="padding: 12px 20px;">
-        <button class="btn btn-primary px-4" (click)="onSearch()">
-          <i class="bi bi-search"></i>
-        </button>
-      </div>
-    </div>
-  </div>
-
   <div *ngIf="products.length === 0" class="text-center py-5">
     <div class="spinner-border text-primary" role="status"></div>
     <p class="mt-2 text-muted">Carregando catálogo...</p>

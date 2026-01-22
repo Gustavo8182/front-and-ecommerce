@@ -12,49 +12,34 @@ import { Product } from '../../models/product.model';
   styleUrl: './search-results.component.scss'
 })
 export class SearchResultsComponent implements OnInit {
-
   products: Product[] = [];
-  searchTerm: string = '';
+  query: string = '';
+  isLoading = true;
 
   constructor(
     private route: ActivatedRoute,
     private productService: ProductService
-    // private cartService: CartService <--- REMOVIDO: Não adicionamos ao carrinho daqui
   ) {}
 
   ngOnInit(): void {
+    // Escuta mudanças na URL (ex: se pesquisar outra coisa sem sair da página)
     this.route.queryParams.subscribe(params => {
-      this.searchTerm = params['q'] || '';
-      this.doSearch(this.searchTerm);
+      this.query = params['q'] || '';
+      this.performSearch();
     });
   }
 
-  doSearch(query: string) {
-    this.productService.getProducts(0, 50, query).subscribe({
-      next: (res) => {
-        this.products = res.content;
+  performSearch(): void {
+    this.isLoading = true;
+    this.productService.search(this.query).subscribe({
+      next: (page) => {
+        this.products = page.content;
+        this.isLoading = false;
       },
-      error: (err) => console.error(err)
+      error: (err) => {
+        console.error('Erro na busca', err);
+        this.isLoading = false;
+      }
     });
-  }
-
-  // --- MÉTODOS DE VISUALIZAÇÃO ---
-
-  // 1. Pega a imagem principal
-  getMainImage(product: any): string {
-    if (product.images && product.images.length > 0) {
-      const mainImg = product.images.find((i: any) => i.main);
-      return mainImg ? mainImg.imageUrl : product.images[0].imageUrl;
-    }
-    return '';
-  }
-
-  // 2. Pega o menor preço para exibir "A partir de R$..."
-  getDisplayPrice(product: any): number {
-    if (product.variations && product.variations.length > 0) {
-      const prices = product.variations.map((v: any) => v.price);
-      return Math.min(...prices);
-    }
-    return 0;
   }
 }
