@@ -1,0 +1,38 @@
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.hover-shadow:hover {
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  transition: box-shadow 0.3s ease;
+}
+
+/* Estilo dos Botões de Variação */
+.btn-variation {
+  border: 2px solid #dee2e6;
+  color: #495057;
+  font-weight: 500;
+  min-width: 80px;
+  transition: all 0.2s;
+
+  &:hover {
+    border-color: #adb5bd;
+    background-color: #f8f9fa;
+  }
+
+  /* Quando selecionado */
+  &.active {
+    border-color: var(--bs-primary); /* Usa a cor primária do Bootstrap (Azul) */
+    background-color: rgba(var(--bs-primary-rgb), 0.1);
+    color: var(--bs-primary);
+    font-weight: bold;
+  }
+
+  /* Quando desabilitado (sem estoque) */
+  &:disabled {
+    opacity: 0.6;
+    background-color: #e9ecef;
+    border-color: #e9ecef;
+    text-decoration: line-through;
+  }
+}

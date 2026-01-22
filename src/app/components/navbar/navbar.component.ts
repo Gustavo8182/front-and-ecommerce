@@ -1,26 +1,29 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { CartService } from '../../services/cart.service';
 import { AuthService } from '../../services/auth.service';
 import { StoreService } from '../../services/store.service'; // Importe o StoreService
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule,FormsModule],
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.scss']
 })
 export class NavbarComponent implements OnInit {
   cartCount: number = 0;
   loggedUser: string | null = null;
-  hasStore = false; // Controle do botão de vendedor
+  hasStore = false;
+  searchQuery: string = '';
 
   constructor(
     private cartService: CartService,
     private authService: AuthService,
-    private storeService: StoreService
+    private storeService: StoreService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -38,6 +41,13 @@ export class NavbarComponent implements OnInit {
         this.hasStore = false;
       }
     });
+  }
+
+  onSearch(): void {
+    if (this.searchQuery.trim()) {
+      // Navega para a rota /search passando o texto como query param
+      this.router.navigate(['/search'], { queryParams: { q: this.searchQuery } });
+    }
   }
 
   checkStoreStatus() {
