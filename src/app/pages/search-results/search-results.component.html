@@ -17,7 +17,7 @@
   <div *ngIf="!isLoading && products.length > 0" class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
     <div class="col" *ngFor="let product of products">
       <div class="card h-100 shadow-sm border-0 hover-card">
-        <img [src]="product.images[0]?.imageUrl || 'assets/placeholder.png'"
+        <img [src]="product.images[0].imageUrl || 'assets/placeholder.png'"
              class="card-img-top"
              style="height: 200px; object-fit: cover;"
              alt="{{ product.name }}">
@@ -31,7 +31,7 @@
           </h5>
 
           <div class="mt-auto">
-            <h4 class="fw-bold text-primary mb-0">R$ {{ product.variations[0]?.price | number:'1.2-2' }}</h4>
+            <h4 class="fw-bold text-primary mb-0">R$ {{ product.variations[0].price | number:'1.2-2' }}</h4>
             <small class="text-muted" *ngIf="product.store">Vendido por: {{ product.store.name }}</small>
           </div>
         </div>

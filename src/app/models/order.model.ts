@@ -21,9 +21,13 @@ export interface OrderAddress {
 export interface Order {
   id: string;
   creationDate: string; // ISO String que vem do Java
-  status: 'WAITING_PAYMENT' | 'PAID' | 'SHIPPED' | 'DELIVERED' | 'CANCELED';
+  status: 'WAITING_PAYMENT' | 'PAID' | 'PREPARING' | 'SHIPPED' | 'DELIVERED' | 'CANCELED';
   total: number;
   items: OrderItem[];
+  user?: {
+    login: string;
+    fullName?: string;
+  };
   address: OrderAddress;
   trackingCode?: string; // Futuro
 }
