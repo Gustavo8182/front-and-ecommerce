@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { OrderService } from '../../services/order.service';
 import { RouterModule } from '@angular/router';
+import { Order } from '../../models/order.model';
 
 @Component({
   selector: 'app-admin-orders',
@@ -11,8 +12,7 @@ import { RouterModule } from '@angular/router';
   styleUrl: './admin-orders.component.scss'
 })
 export class AdminOrdersComponent implements OnInit {
-
-  orders: any[] = [];
+  orders: Order[] = []; // Tipagem correta
 
   constructor(private orderService: OrderService) {}
 
@@ -22,13 +22,16 @@ export class AdminOrdersComponent implements OnInit {
 
   loadOrders() {
     this.orderService.getAllOrders().subscribe({
-      next: (data) => {
-        // Ordena por data (mais novos primeiro)
-        this.orders = data.sort((a, b) => new Date(b.creationDate).getTime() - new Date(a.creationDate).getTime());
+      // CORREÇÃO: Adicione o tipo (data: Order[])
+      next: (data: Order[]) => {
+        // CORREÇÃO: Adicione tipos no sort (a: Order, b: Order)
+        this.orders = data.sort((a: Order, b: Order) =>
+          new Date(b.creationDate).getTime() - new Date(a.creationDate).getTime()
+        );
       },
-      error: (err) => {
+      // CORREÇÃO: Adicione tipo no erro (err: any)
+      error: (err: any) => {
         console.error(err);
-        alert('Erro ao carregar pedidos. Verifique se você é Admin.');
       }
     });
   }
