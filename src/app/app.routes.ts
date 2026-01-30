@@ -16,6 +16,7 @@ import { SellerOrdersComponent } from './pages/seller-orders/seller-orders.compo
 import { authGuard } from './guards/auth.guard';
 import { StoreProfileComponent } from './pages/store-profile/store-profile.component';
 import { ForgotPasswordComponent } from './pages/forgot-password/forgot-password.component';
+import { StoreConfigComponent } from './pages/seller-panel/store-config/store-config.component';
 
 export const routes: Routes = [
     { path: '', component: ProductListComponent },
@@ -38,6 +39,7 @@ export const routes: Routes = [
 
     // Área do Vendedor (Seller Center)
     { path: 'seller-center', component: SellerCenterComponent, canActivate: [authGuard] },
+    { path: 'seller/config', component: StoreConfigComponent, canActivate: [authGuard] },
 
     // CORREÇÃO AQUI: Removemos a duplicata e deixamos apenas o componente correto
     { path: 'seller/orders', component: SellerOrdersComponent, canActivate: [authGuard] },

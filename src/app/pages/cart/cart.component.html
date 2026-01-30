@@ -1,154 +1,127 @@
-<div class="container mt-5 mb-5">
-  <h2 class="mb-4"><i class="bi bi-cart3"></i> Seu Carrinho</h2>
+<div class="container mt-5 mb-5 fade-in">
+  <h2 class="mb-4 fw-bold"><i class="bi bi-cart3"></i> Meu Carrinho</h2>
 
-  <div *ngIf="cartItems.length === 0" class="text-center py-5 bg-light rounded">
-    <i class="bi bi-basket display-1 text-muted"></i>
+  <div *ngIf="groupedItems.length === 0" class="text-center py-5 bg-white rounded shadow-sm border">
+    <i class="bi bi-basket display-1 text-muted opacity-25"></i>
     <p class="mt-3 text-muted lead">Seu carrinho está vazio.</p>
-    <a routerLink="/" class="btn btn-primary mt-3">Voltar às Compras</a>
+    <a routerLink="/" class="btn btn-primary mt-3 px-4 rounded-pill">Ir às Compras</a>
   </div>
 
-  <div *ngIf="cartItems.length > 0" class="row">
+  <div *ngIf="groupedItems.length > 0" class="row g-4">
 
     <div class="col-lg-8">
 
-      <div class="card shadow-sm border-0 mb-4" *ngFor="let item of cartItems">
-        <div class="card-body d-flex align-items-center flex-wrap">
+      <div *ngFor="let group of groupedItems" class="card border-0 shadow-sm mb-4 overflow-hidden">
 
-          <img [src]="getItemImage(item)"
-               [routerLink]="['/product', item.product.id]"
-               class="rounded me-3"
-               style="width: 80px; height: 80px; object-fit: contain; cursor: pointer;"
-               title="Ver detalhes">
-
-          <div class="flex-grow-1 me-3" style="min-width: 200px;">
-            <h5 class="mb-1 text-primary" [routerLink]="['/product', item.product.id]" style="cursor: pointer;">
-              {{ item.product.name }}
-            </h5>
-
-            <small class="badge bg-light text-dark border mb-2">
-              {{ item.variation.name }}
-            </small>
-
-            <p class="text-muted small mb-0">
-                Unitário: {{ item.variation.price | currency:'BRL' }}
-            </p>
-          </div>
-
-          <div class="d-flex align-items-center border rounded me-4">
-            <button class="btn btn-sm btn-light px-3" (click)="decrease(item)">-</button>
-            <span class="mx-3 fw-bold">{{ item.quantity }}</span>
-            <button class="btn btn-sm btn-light px-3" (click)="increase(item)">+</button>
-          </div>
-
-          <div class="text-end me-3" style="width: 120px;">
-            <h5 class="mb-0 text-primary">
-                {{ (item.variation.price * item.quantity) | currency:'BRL' }}
-            </h5>
-          </div>
-
-          <button class="btn btn-link text-danger p-0" (click)="remove(item)">
-            <i class="bi bi-trash-fill lead"></i>
-          </button>
+        <div class="card-header bg-light py-3 border-bottom">
+            <small class="text-muted text-uppercase fw-bold">Vendido e entregue por</small>
+            <div class="fw-bold fs-5 text-dark"><i class="bi bi-shop me-2"></i>{{ group.storeName }}</div>
         </div>
-      </div>
 
-      <div class="card shadow-sm border-0 mb-4">
-        <div class="card-header bg-white py-3">
-          <h5 class="mb-0"><i class="bi bi-geo-alt-fill text-danger"></i> Endereço de Entrega</h5>
-        </div>
-        <div class="card-body">
+        <div class="card-body p-0">
+            <div *ngFor="let item of group.items" class="d-flex p-3 border-bottom align-items-center">
+                <img [src]="getItemImage(item)" class="rounded border me-3" style="width: 70px; height: 70px; object-fit: cover;">
 
-          <div *ngIf="!isLogged" class="alert alert-warning">
-            Para cadastrar um endereço, você precisa <a routerLink="/login">fazer login</a>.
-          </div>
+                <div class="flex-grow-1">
+                    <h6 class="mb-1 fw-bold text-truncate">{{ item.product.name }}</h6>
+                    <small class="badge bg-light text-dark border">{{ item.variation.name }}</small>
+                </div>
 
-          <div *ngIf="isLogged">
-            <div *ngFor="let addr of addresses" class="form-check mb-3 p-3 border rounded">
-              <input class="form-check-input" type="radio" name="address"
-                     [id]="'addr-'+addr.id" [value]="addr.id"
-                     [(ngModel)]="selectedAddressId">
-              <label class="form-check-label w-100" [for]="'addr-'+addr.id">
-                <strong>{{ addr.street }}, {{ addr.number }}</strong>
-                <span class="text-muted d-block small">
-                  {{ addr.neighborhood }} - {{ addr.city }}/{{ addr.state }} - CEP: {{ addr.zipCode }}
-                </span>
-              </label>
+                <div class="d-flex align-items-center border rounded px-2 me-3">
+                    <button class="btn btn-sm btn-link text-dark text-decoration-none" (click)="decrease(item)">-</button>
+                    <span class="mx-2 fw-bold">{{ item.quantity }}</span>
+                    <button class="btn btn-sm btn-link text-dark text-decoration-none" (click)="increase(item)">+</button>
+                </div>
+
+                <div class="text-end" style="min-width: 90px;">
+                    <div class="fw-bold">{{ (item.variation.price * item.quantity) | currency:'BRL' }}</div>
+                    <small class="text-danger cursor-pointer" (click)="remove(item)">Remover</small>
+                </div>
             </div>
 
-            <button *ngIf="!showAddressForm" class="btn btn-outline-primary w-100 mt-2" (click)="showAddressForm = true">
-              <i class="bi bi-plus-circle"></i> Cadastrar Novo Endereço
-            </button>
+            <div class="p-3 bg-white">
+                <label class="form-label small fw-bold text-muted"><i class="bi bi-truck"></i> Calcule o frete para esta loja:</label>
+                <div class="d-flex gap-2 mb-3" style="max-width: 300px;">
+                    <input type="text" class="form-control form-control-sm" [(ngModel)]="group.shippingZipCode" mask="00000-000" placeholder="00000-000">
+                    <button class="btn btn-outline-primary btn-sm" (click)="calculateShipping(group)" [disabled]="group.isCalculating">OK</button>
+                </div>
 
-            <div *ngIf="showAddressForm" class="mt-4 p-3 bg-light rounded border">
-              <h6 class="mb-3">Novo Endereço</h6>
-              <form (submit)="saveAddress()">
-                <div class="row g-2">
-                  <div class="col-md-3">
-                    <input type="text" class="form-control" placeholder="CEP" [(ngModel)]="newAddress.zipCode" name="zipCode" required>
-                  </div>
-                  <div class="col-md-7">
-                    <input type="text" class="form-control" placeholder="Rua" [(ngModel)]="newAddress.street" name="street" required>
-                  </div>
-                  <div class="col-md-2">
-                    <input type="text" class="form-control" placeholder="Nº" [(ngModel)]="newAddress.number" name="number" required>
-                  </div>
-                  <div class="col-md-6">
-                    <input type="text" class="form-control" placeholder="Bairro" [(ngModel)]="newAddress.neighborhood" name="neighborhood" required>
-                  </div>
-                  <div class="col-md-4">
-                    <input type="text" class="form-control" placeholder="Cidade" [(ngModel)]="newAddress.city" name="city" required>
-                  </div>
-                  <div class="col-md-2">
-                    <input type="text" class="form-control" placeholder="UF" [(ngModel)]="newAddress.state" name="state" required>
-                  </div>
-                  <div class="col-12">
-                    <input type="text" class="form-control" placeholder="Complemento (opcional)" [(ngModel)]="newAddress.complement" name="complement">
-                  </div>
+                <div *ngIf="group.isCalculating" class="spinner-border spinner-border-sm text-primary"></div>
+
+                <div *ngIf="group.shippingOptions.length > 0" class="d-flex flex-column gap-2 mt-2">
+                    <div *ngFor="let option of group.shippingOptions"
+                         class="form-check border rounded p-2 ps-5 cursor-pointer hover-bg-light"
+                         (click)="selectShipping(group, option)">
+                        <input class="form-check-input" type="radio" [checked]="group.selectedShipping === option" name="shipping_{{group.storeId}}">
+                        <label class="form-check-label w-100 cursor-pointer">
+                            <div class="d-flex justify-content-between">
+                                <span class="fw-semibold">{{ option.serviceName }}</span>
+                                <span class="fw-bold text-success">{{ option.price | currency:'BRL' }}</span>
+                            </div>
+                            <small class="text-muted">{{ option.deliveryDays }} dias úteis</small>
+                        </label>
+                    </div>
                 </div>
-                <div class="d-flex gap-2 mt-3">
-                  <button type="submit" class="btn btn-success flex-fill">Salvar Endereço</button>
-                  <button type="button" class="btn btn-secondary" (click)="showAddressForm = false">Cancelar</button>
-                </div>
-              </form>
             </div>
 
-          </div>
+            <div class="card-footer bg-white text-end py-3">
+                <span class="text-muted me-2">Subtotal Loja:</span>
+                <span class="fw-bold fs-5">{{ (group.subtotal + (group.selectedShipping?.price || 0)) | currency:'BRL' }}</span>
+            </div>
         </div>
       </div>
-
     </div>
 
-    <div class="col-lg-4">
-      <div class="card shadow-sm border-0 bg-white position-sticky" style="top: 20px;">
+   <div class="col-lg-4">
+      <div class="card border-0 shadow-sm position-sticky" style="top: 20px;">
         <div class="card-body p-4">
-          <h4 class="card-title mb-4">Resumo do Pedido</h4>
+            <h4 class="fw-bold mb-4">Resumo do Pedido</h4>
 
-          <div class="d-flex justify-content-between mb-2">
-            <span class="text-muted">Subtotal</span>
-            <span class="fw-bold">{{ total | currency:'BRL' }}</span>
-          </div>
-          <div class="d-flex justify-content-between mb-3 text-success">
-            <span>Frete</span>
-            <span>Grátis</span> </div>
+            <div class="d-flex justify-content-between mb-2">
+                <span class="text-muted">Produtos</span>
+                <span>{{ getProductsSubtotal() | currency:'BRL' }}</span>
+            </div>
 
-          <hr>
+            <div class="d-flex justify-content-between mb-3 text-success">
+                <span>Frete Total</span>
+                <span>{{ getFreightTotal() | currency:'BRL' }}</span>
+            </div>
 
-          <div class="d-flex justify-content-between mb-4 align-items-center">
-            <span class="h5 mb-0">Total</span>
-            <span class="h3 text-primary mb-0">{{ total | currency:'BRL' }}</span>
-          </div>
+            <hr>
 
-          <button class="btn btn-success w-100 py-3 fw-bold shadow-sm"
-                  (click)="checkout()"
-                  [disabled]="!selectedAddressId && isLogged">
-            FINALIZAR COMPRA
-          </button>
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <span class="h5 mb-0">Total</span>
+                <span class="h3 text-primary mb-0 fw-bold">{{ totalGeneral | currency:'BRL' }}</span>
+            </div>
 
-          <div class="text-center mt-3">
-            <a routerLink="/" class="text-decoration-none text-muted small">
-              <i class="bi bi-arrow-left"></i> Continuar Comprando
-            </a>
-          </div>
+              <div *ngIf="isLogged" class="mb-3">
+                <label class="form-label small fw-bold">Entregar em:</label>
+
+                <select class="form-select mb-2"
+                        [(ngModel)]="selectedAddressId"
+                        (change)="onAddressChange()">
+                    <option *ngFor="let addr of addresses" [value]="addr.id">
+                        {{ addr.street }}, {{ addr.number }}
+                    </option>
+                </select>
+
+                <button *ngIf="!showAddressForm" class="btn btn-link btn-sm p-0" (click)="showAddressForm = true">Cadastrar novo endereço</button>
+              </div>
+
+            <div *ngIf="showAddressForm" class="bg-light p-3 rounded mb-3 border">
+                 <small>Formulário de endereço...</small>
+            </div>
+
+            <button class="btn btn-success w-100 py-3 fw-bold shadow-sm"
+                    (click)="checkout()"
+                    [disabled]="isLoading || (isLogged && !selectedAddressId)">
+                <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2"></span>
+                FINALIZAR COMPRA
+            </button>
+
+            <div *ngIf="!isLogged" class="text-center mt-2 small text-danger">
+                Faça login para finalizar
+            </div>
         </div>
       </div>
     </div>

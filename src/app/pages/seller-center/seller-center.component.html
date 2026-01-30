@@ -65,6 +65,19 @@
         <small class="text-muted" style="font-size: 0.75rem;">ID: {{ store.id | slice:0:8 }}...</small>
       </div>
 
+        <div class="nav flex-column gap-2">
+            <div class="nav-group mb-3">
+              <span class="text-uppercase text-muted fw-bold px-2 mb-2 d-block" style="font-size: 0.75rem;">Minha Loja</span>
+                <a class="nav-link" [routerLink]="['/store', store?.id]" target="_blank">
+                  <i class="bi bi-box-arrow-up-right"></i>
+                  Ver Vitrine
+                </a>
+                <a class="nav-link" routerLink="/seller/config" routerLinkActive="active">
+                  <i class="bi bi-gear"></i>
+                  Configurações
+                </a>
+            </div>
+        </div>
       <div class="nav flex-column gap-2">
         <div class="nav-group mb-3">
           <span class="text-uppercase text-muted fw-bold px-2 mb-2 d-block" style="font-size: 0.75rem;">Pedido</span>
