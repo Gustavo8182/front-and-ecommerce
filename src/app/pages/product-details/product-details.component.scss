@@ -35,4 +35,24 @@
     border-color: #e9ecef;
     text-decoration: line-through;
   }
+
+  .last-border-none:last-child {
+  border-bottom: none !important;
+}
+
+.hover-bg-light:hover {
+  background-color: #f8f9fa;
+}
+
+.transition {
+  transition: all 0.2s ease-in-out;
+}
+
+.hover-scale:hover {
+  transform: scale(1.2);
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
 }

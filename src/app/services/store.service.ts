@@ -1,7 +1,7 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { catchError, map, Observable, of } from 'rxjs';
-import { CreateStoreRequest, Store } from '../models/store.model';
+import { CreateStoreRequest, Store, StoreConfig } from '../models/store.model';
 import { environment } from '../../environments/environment';
 
 @Injectable({
@@ -44,5 +44,9 @@ export class StoreService {
 
   getById(id: string): Observable<Store> {
     return this.http.get<Store>(`${this.apiUrl}/stores/${id}`);
+  }
+
+  updateConfig(config: StoreConfig): Observable<any> {
+    return this.http.put(`${this.apiUrl}/stores/config`, config, { headers: this.getHeaders() });
   }
 }
