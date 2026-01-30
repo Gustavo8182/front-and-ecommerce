@@ -31,3 +31,15 @@ export interface Order {
   address: OrderAddress;
   trackingCode?: string; // Futuro
 }
+
+export interface OrderItem {
+  id: string;
+  productId: string; // Lembre que adicionamos esse também
+  productName: string;
+  variationName: string;
+  price: number;
+  quantity: number;
+  subtotal: number;
+  imageUrl: string;
+  reviewed: boolean; // <--- NOVO
+}

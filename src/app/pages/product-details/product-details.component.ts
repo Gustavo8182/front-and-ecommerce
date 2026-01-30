@@ -4,6 +4,8 @@ import { ActivatedRoute, RouterModule } from '@angular/router';
 import { ProductService } from '../../services/product.service';
 import { CartService } from '../../services/cart.service';
 import { Product, ProductVariation } from '../../models/product.model';
+import { Review } from '../../models/review.model';
+import { ReviewService } from '../../services/review.service';
 
 @Component({
   selector: 'app-product-details',
@@ -18,11 +20,14 @@ export class ProductDetailsComponent implements OnInit {
   selectedVariation: ProductVariation | null = null;
   currentImage: string = '';
   isLoading = true;
+  reviews: Review[] = []; // Nova lista
+  averageRating = 0; // Média para mostrar no topo
 
   constructor(
     private route: ActivatedRoute,
     private productService: ProductService,
-    private cartService: CartService
+    private cartService: CartService,
+    private reviewService: ReviewService
   ) {}
 
   ngOnInit(): void {
@@ -41,6 +46,8 @@ export class ProductDetailsComponent implements OnInit {
           }
 
           this.isLoading = false;
+          // CARREGAR REVIEWS AQUI 👇
+          this.loadReviews(data.id);
         },
         // CORREÇÃO 3: Tipagem do erro (err: any)
         error: (err: any) => {
@@ -82,4 +89,16 @@ export class ProductDetailsComponent implements OnInit {
     }
     return 'assets/placeholder.png';
   }
+
+  loadReviews(productId: string) {
+    this.reviewService.getProductReviews(productId).subscribe(data => {
+      this.reviews = data;
+      // Calcular média simples
+      if (data.length > 0) {
+        const sum = data.reduce((acc, curr) => acc + curr.rating, 0);
+        this.averageRating = sum / data.length;
+      }
+    });
+  }
+
 }
